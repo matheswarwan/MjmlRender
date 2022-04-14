@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Code Snippets</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="./slds/css/service_contentbuilder.css"
+    />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
+      integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script src="CodeMirror/codemirror.js"></script>
+    <script src="mjmldoc.js"></script>
+    <link rel="stylesheet" href="CodeMirror/codemirror.css" />
+    <script src="CodeMirror/mode/javascript/javascript.js"></script>
+    <script src="CodeMirror/mode/htmlmixed/htmlmixed.js"></script>
+    <script type="text/javascript" src="CodeMirror/mode/xml/xml.js"></script>
+    <style>
+      .CodeMirror-cursor {
+        display: none !important;
+      }
+      .copy-code-wrap {
+        height: 34px;
+        width: 34px;
+        position: absolute;
+        bottom: -10px;
+        right: -10px;
+        z-index: 10;
+        cursor: pointer;
+      }
+      .copy-code {
+        position: absolute;
+        right: 0;
+        top: 0;
+        background: #e0e0e0;
+        transition: 0.2s;
+        background-image: url("./img/copyIcon.png");
+        background-repeat: no-repeat;
+        height: 16px;
+        width: 16px;
+        display: inline-block;
+        background-position: -48px 0;
+      }
+      .copy-code::after {
+        font-family: "Font Awesome 5 Free";
+        font-weight: 600;
+        font-size: 16px;
+        content: "\f328";
+        color: #fff;
+        position: absolute;
+        top: 3px;
+        left: 10px;
+      }
+      .copy-code-wrap:active .copy-code {
+        transform: translate(0, 0) scale(0.9);
+      }
+      .animate {
+        transform: translate(0, 0) scale(1.12);
+      }
+
+      .tooltip {
+        font-size: 15px;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+      }
+      .styling-subsection-title {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- MK- Copy code can't be used as it is not supported by SFMC.
+      <div class="copy-code-wrap">
+      <div class="copy-code"></div>
+    </div>
+    -->
+    <div class="contentparent">
+    <div class="contentsection">
+      <div class="contentsettings-section-header">mj-body</div>
+      <div class="styling-subsection-title">
+        This is the starting point of your email.
+      </div>
+      <div class="styling-subsection-textarea">
+        <textarea
+          class="copy-code code-text-area"
+          style="width: 100%; height: 80%"
+          placeholder="Enter MJML Source Code"
+          id="editing"
+          spellcheck="true"
+        ></textarea>
+      </div>
+    </div>
+    <br />
+    <div>
+      <div class="contentsection">
+        <div class="contentsettings-section-header">mj-include</div>
+        <div class="styling-subsection-title">
+          The <code>mjml-core</code> package allows you to include external mjml
+          files to build your email template.
+        </div>
+        <div>
+          <textarea
+            class="copy-code code-text-area"
+            style="width: 100%; height: 80%"
+            placeholder="Enter MJML Source Code"
+            id="editing"
+            spellcheck="true"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+    <br />
+    <div>
+      <div class="contentsection">
+        <div class="contentsettings-section-header">mj-attribute</div>
+        <div class="styling-subsection-title">
+          <p>
+            Inside <code>mj-attributes</code>, a tag citing one MJML component
+            (like <code>mj-text</code>; see example) overrides default settings
+            for listed MJML attributes on the one component.
+          </p>
+        </div>
+        <div>
+          <textarea
+            class="copy-code code-text-area"
+            style="width: 100%; height: 80%"
+            placeholder="Enter MJML Source Code"
+            id="editing"
+            spellcheck="true"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+    <br />
+    <div>
+      <div class="contentsection">
+        <div class="contentsettings-section-header">mj-accordion</div>
+        <div class="styling-subsection-title">
+          <p>
+            <code>mj-accordion</code> is an interactive MJML component to stack
+            content in tabs, so the information is collapsed and only the titles
+            are visible. Readers can interact by clicking on the tabs to reveal
+            the content, providing a great experience on mobile devices where
+            space is scarce.
+          </p>
+        </div>
+        <div>
+          <textarea
+            class="copy-code code-text-area"
+            style="width: 100%; height: 80%"
+            placeholder="Enter MJML Source Code"
+            id="editing"
+            spellcheck="true"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+    <br />
+    <div>
+      <div class="contentsection">
+        <div class="contentsettings-section-header">mj-button</div>
+        <div class="styling-subsection-title">
+          <p>
+            Displays a customizable button.<br />
+            The <code>mj-button</code> won't be fully clickable because of
+            client support. See discussion at
+            <a href="https://github.com/mjmlio/mjml/issues/359" target="_blank"
+              >Issue #359</a
+            >.
+          </p>
+        </div>
+        <div>
+          <textarea
+            class="copy-code code-text-area"
+            style="width: 100%; height: 80%"
+            placeholder="Enter MJML Source Code"
+            id="editing"
+            spellcheck="true"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+    <br />
+    <div>
+      <div class="contentsection">
+        <div class="contentsettings-section-header">mj-carousel</div>
+        <div class="styling-subsection-title">
+          <p>
+            <code>mj-carousel</code> displays a gallery of images or "carousel".
+            Readers can interact by hovering and clicking on thumbnails
+            depending on the email client they use.<br />This component enables
+            you to set the styles of the carousel elements.
+          </p>
+        </div>
+        <div>
+          <textarea
+            class="copy-code code-text-area"
+            style="width: 100%; height: 80%"
+            placeholder="Enter MJML Source Code"
+            id="editing"
+            spellcheck="true"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+    <br />
+    <div>
+      <div class="contentsection">
+        <div class="contentsettings-section-header">mj-column</div>
+        <div class="styling-subsection-title">
+          <p>
+            Columns enable you to horizontally organize the content within your
+            sections. They must be located under <code>mj-section</code> tags in
+            order to be considered by the engine. To be responsive, columns are
+            expressed in terms of percentage.<br />Every single column has to
+            contain something because they are responsive containers, and will
+            be vertically stacked on a mobile view. Any standard component, or
+            component that you have defined and registered, can be placed within
+            a column – except <code>mj-column</code> or
+            <code>mj-section</code> elements.
+          </p>
+        </div>
+        <div>
+          <textarea
+            class="copy-code code-text-area"
+            style="width: 100%; height: 80%"
+            placeholder="Enter MJML Source Code"
+            id="editing"
+            spellcheck="true"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+    <br />
+    <div>
+      <div class="contentsection">
+        <div class="contentsettings-section-header">mj-divider</div>
+        <div class="styling-subsection-title">
+          <p>
+            Displays a horizontal divider that can be customized like a HTML
+            border.
+          </p>
+        </div>
+        <div>
+          <textarea
+            class="copy-code code-text-area"
+            style="width: 100%; height: 80%"
+            placeholder="Enter MJML Source Code"
+            id="editing"
+            spellcheck="true"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+    <br />
+    <div>
+      <div class="contentsection">
+        <div class="contentsettings-section-header">mj-hero</div>
+        <div class="styling-subsection-title">
+          <p>
+            This element displays a hero image. It behaves like an
+            <code>mj-section</code> with a single mj-column.
+            <br />
+            <code>background-height</code> and
+            <code>background-width</code> attributes are mandatory. It's best to
+            use an image with width the same as the <code>mj-body</code> width
+            (<code>width="600px"</code> by default). For better results, it's
+            best to use an image with height the same or larger than the height
+            of <code>mj-hero</code>. Use background-color to provide a fallback
+            color in case an email client doesn't support background-url.
+          </p>
+        </div>
+        <div>
+          <textarea
+            class="copy-code code-text-area"
+            style="width: 100%; height: 80%"
+            placeholder="Enter MJML Source Code"
+            id="editing"
+            spellcheck="true"
+          ></textarea>
+        </div>
+        <br />
+        <div>
+          <div class="contentsection">
+            <div class="contentsettings-section-header">mj-image</div>
+            <div class="styling-subsection-title">
+              <p>
+                Displays a responsive image in your email. It is similar to the
+                HTML <code>&lt;img /&gt;</code> tag. Note that if no width is
+                provided, the image will use the parent column width.
+              </p>
+            </div>
+            <div>
+              <textarea
+                class="copy-code code-text-area"
+                style="width: 100%; height: 80%"
+                placeholder="Enter MJML Source Code"
+                id="editing"
+                spellcheck="true"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+        <br />
+        <div>
+          <div class="contentsection">
+            <div class="contentsettings-section-header">mj-raw</div>
+            <div class="styling-subsection-title">
+              <p>
+                Displays raw HTML that is not going to be parsed by the MJML engine. Anything left inside this tag should be raw, responsive HTML. If placed inside <code>&lt;mj-head&gt;</code>, its content will be added at the end of the <code>&lt;head&gt;</code>.
+                <br>If you use <code>mj-raw</code> to add templating language, and use the minify option, you might get a <code>Parsing error</code>, especially when using the < character. You can tell the minifier to ignore some content by wrapping it between two <code>&lt;!-- htmlmin:ignore --&gt;</code> tags.
+              </p>
+            </div>
+            <div>
+              <textarea
+                class="copy-code code-text-area"
+                style="width: 100%; height: 80%"
+                placeholder="Enter MJML Source Code"
+                id="editing"
+                spellcheck="true"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+        <br />
+        <div>
+          <div class="contentsection">
+            <div class="contentsettings-section-header">mj-section</div>
+            <div class="styling-subsection-title">
+              <p>
+                Sections are intended to be used as rows within your email. They will be used to structure the layout.
+                <br>The <code>full-width</code> property will be used to manage the background width. By default, it will be 600px. With the <code>full-width</code> property on, it will be changed to 100%.
+              </p>
+            </div>
+            <div>
+              <textarea
+                class="copy-code code-text-area"
+                style="width: 100%; height: 80%"
+                placeholder="Enter MJML Source Code"
+                id="editing"
+                spellcheck="true"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+        <br>
+        <div>
+          <div class="contentsection">
+            <div class="contentsettings-section-header">mj-social</div>
+            <div class="styling-subsection-title">
+              <p>
+                Displays calls-to-action for various social networks with their
+                associated logo. You can add social networks with the
+                <code>mj-social-element</code> tag.
+              </p>
+            </div>
+            <div>
+              <textarea
+                class="copy-code code-text-area"
+                style="width: 100%; height: 80%"
+                placeholder="Enter MJML Source Code"
+                id="editing"
+                spellcheck="true"
+              ></textarea>
+            </div>
+          </div>
+          <br>
+          <div>
+            <div class="contentsection">
+              <div class="contentsettings-section-header">mj-spacer</div>
+              <div class="styling-subsection-title">
+                <p>
+                  Displays a blank space.
+                </p>
+              </div>
+              <div>
+                <textarea
+                  class="copy-code code-text-area"
+                  style="width: 100%; height: 80%"
+                  placeholder="Enter MJML Source Code"
+                  id="editing"
+                  spellcheck="true"
+                ></textarea>
+              </div>
+            </div>
+        </div>
+        <br>
+          <div>
+            <div class="contentsection">
+              <div class="contentsettings-section-header">mj-table</div>
+              <div class="styling-subsection-title">
+                <p>
+                  This tag allows you to display table and filled it with data. It only accepts plain HTML.<br> <code>`mj-table`</code> is an "ending tag", which means it can contain HTML code which will be left as it is, so it can contain HTML tags with attributes, but it cannot contain other MJML components. In <code>`mj-table`</code> specifically, you can put anything you would put in a `<table>` element. 
+                </p>
+              </div>
+              <div>
+                <textarea
+                  class="copy-code code-text-area"
+                  style="width: 100%; height: 80%"
+                  placeholder="Enter MJML Source Code"
+                  id="editing"
+                  spellcheck="true"
+                ></textarea>
+              </div>
+            </div>
+        </div>
+        <br>
+          <div>
+            <div class="contentsection">
+              <div class="contentsettings-section-header">mj-text</div>
+              <div class="styling-subsection-title">
+                <p>
+                  This tag allows you to display text in your email. 
+                </p>
+              </div>
+              <div>
+                <textarea
+                  class="copy-code code-text-area"
+                  style="width: 100%; height: 80%"
+                  placeholder="Enter MJML Source Code"
+                  id="editing"
+                  spellcheck="true"
+                ></textarea>
+              </div>
+            </div>
+        </div>
+        <br>
+          <div>
+            <div class="contentsection">
+              <div class="contentsettings-section-header">mj-wrapper</div>
+              <div class="styling-subsection-title">
+                <p>
+                  Wrapper enables to wrap multiple sections together. It's especially useful to achieve nested layouts with shared border or background images across sections.<br>The <code>full-width</code> property will be used to manage the background width. By default, it will be 600px. With the <code>full-width</code> property on, it will be changed to 100%.
+                </p>
+              </div>
+              <div>
+                <textarea
+                  class="copy-code code-text-area"
+                  style="width: 100%; height: 80%"
+                  placeholder="Enter MJML Source Code"
+                  id="editing"
+                  spellcheck="true"
+                ></textarea>
+              </div>
+            </div>
+        </div>
+        <!-- <br>
+          <div>
+            <div class="contentsection">
+              <div class="contentsettings-section-header">Ending tags</div>
+              <div class="styling-subsection-title">
+                <p style="word-break: break-all; ">
+                  Some of the mjml components are "ending tags". These are mostly the components that will contain text contents, like mj-text or mj-buttons. These components can contain not only text, but also any HTML content, which will be completely unprocessed and left as it is. This means you cannot use other MJML components inside them, but you can use any HTML tag, like &lt;img&gt; or &lt;a&gt;.
+                  
+                  <br>This has a little downside : The content is not modified at all, this means that the text won't be escaped, so if you use characters that are used to define html tags in your text, like < or >, you should use the encoded characters &lt; and &lt;. If you don't, sometimes the browser can be clever enough to understand that you're not really trying to open/close an html tag, and display the unescaped character as normal text, but this may cause problems in some cases. For instance, this will likely cause problems if you use the minify option, mj-html-attributes or an inline mj-style, because these require the html to be re-parsed internally. If you're just using the minify option, and really need to use the < > characters, i.e. for templating language, you can also avoid this problem by wrapping the troublesome content between two <!-- htmlmin:ignore - - >  tags.
+
+
+                  <br>Here is the list of all ending tags : - mj-accordion-text - mj-accordion-title - mj-button - mj-navbar-link - mj-raw - mj-social-element - mj-text - mj-table 
+                </p>
+              </div>-->
+              
+            </div>
+        </div>
+    
+      </div>
+    </div>
+    <br />
+    </div>
+  </body>
+  <script>
+    /*  for(var i=0; i< mjmlTitle.length; i++) {
+        console.dir(document.getElementById('contentparent'));
+        var e = document.createElement('div');
+        e.className = "contentsection";
+        
+          e1 = document.createElement('div')
+          e1.className = "contentsettings-section-header";
+          e1.innerHTML = mjmlTitle[i];
+        
+          e2 = document.createElement('div');
+          e2.className = "styling-subsection-title";
+          e2.innerHTML = '<p>' + mjmlDescription[i] + '</p>';
+
+          e3 = document.createElement('div');
+          
+          e4 = document.createElement('textarea');
+          e4.className = "copy-code code-text-area";
+          e4.placeholder = "Enter MJML Source Code"
+          e4.style="width: 100%; height: 80%"
+          e4.spellcheck = "true"
+          e4.id = "editing"
+          
+          e3.appendChild(e4)
+
+          e.appendChild(e1);
+          e.appendChild(e2);
+          e.appendChild(e3);
+        console.dir(e)
+        document.getElementById('contentparent').appendChild(e);
+      } */
+  </script>
+  <script>
+    /* Code mirror script */
+    
+    var myCodeMirror;
+    var elt = document.getElementsByClassName("code-text-area");
+    for (var i = 0; i < elt.length; i++) {
+      genCodeEditor(elt[i]);
+    }
+    function genCodeEditor(elt) {
+      myCodeMirror = CodeMirror.fromTextArea(elt, {
+        lineNumbers: true,
+        mode: "xml",
+        htmlMode: true,
+        lineSeparator: null,
+        theme: "default",
+        indentUnit: 2,
+        tabSize: 4,
+        indentWithTabs: true,
+        lineWrapping: true,
+        tabindex: 1,
+        autofocus: true,
+        gutter: true,
+        lineWrapping: true,
+        autoRefresh: true,
+        readOnly: "true",
+        height: "auto",
+        extraKeys: {
+          "Ctrl-x": function (instance) {
+            console.log("ctrl s click");
+          },
+        },
+      });
+      myCodeMirror.setSize(null, "100%");
+      myCodeMirror.refresh();
+
+      function setValueInCodeEditor(mjmlText) {
+        myCodeMirror.setValue(mjmlText);
+        myCodeMirror.refresh();
+      }
+
+      setValueInCodeEditor(mjmlText[i]);
+    }
+
+    //hide contents by default
+    /* var el = document.getElementsByClassName("styling-subsection-title");
+    for (var i=0;i<el.length;i++) {
+      el[i].style.display = 'none';
+    }
+    var el = document.getElementsByClassName("CodeMirror");
+    for (var i=0;i<el.length;i++) {
+      el[i].style.display = 'none';
+    } */
+    /*function setMJMLText() { 
+      console.log('on load');
+      var elt = document.getElementsByClassName("code-text-area");
+      for(var i = 0; i < elt.length; i++){
+        myCodeMirror.setValue(mjmlText);
+        myCodeMirror.refresh();
+      }
+     } */
+  </script>
+  <script>
+    const $ = function (selector, bind) {
+      var bind = bind === undefined ? document : bind;
+      let nodes = bind.querySelectorAll.bind(bind)(selector);
+      return nodes.length == 1 ? nodes[0] : nodes;
+    };
+
+    $(".copy-code-wrap").onclick = function (e) {
+      if (e.which == 1) {
+        // write the text to the clipboard
+        navigator.clipboard.writeText(myCodeMirror.getValue());
+
+        // animate the button
+        var copy = $(".copy-code", this);
+        function quickadd() {
+          copy.classList.add("animate");
+          setTimeout(function () {
+            copy.classList.remove("animate");
+          }, 200);
+        }
+        quickadd();
+      }
+    };
+  </script>
+  <script>
+    const divs = document.querySelectorAll(".contentsettings-section-header");
+
+    divs.forEach((el) =>
+      el.addEventListener("click", (event) => {
+        changeAccordion(el.parentElement);
+      })
+    );
+    function changeAccordion(el) {
+      //Toggling content
+      el.getElementsByClassName("styling-subsection-title")[0].style.display =
+        el.getElementsByClassName("styling-subsection-title")[0].style
+          .display == "none"
+          ? "inline-block"
+          : "none";
+      el.getElementsByClassName("CodeMirror-wrap")[0].style.display =
+        el.getElementsByClassName("CodeMirror-wrap")[0].style.display == "none"
+          ? "inline-block"
+          : "none";
+      myCodeMirror.refresh();
+    }
+  </script>
+</html>

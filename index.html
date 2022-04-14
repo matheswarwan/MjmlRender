@@ -1,0 +1,588 @@
+<html>
+  <head>
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap"
+      rel="stylesheet"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="CodeMirror/codemirror.js"></script>
+    <link rel="stylesheet" href="CodeMirror/codemirror.css" />
+    <script src="js/mjml.js"></script>
+    <script src="CodeMirror/mode/javascript/javascript.js"></script>
+    <script src="CodeMirror/mode/htmlmixed/htmlmixed.js"></script>
+    <script type="text/javascript" src="CodeMirror/mode/xml/xml.js"></script>
+    <style>
+      .btn {
+        background: #0070d2;
+        color: #fff;
+        box-shadow: none;
+        outline: None;
+        display: inline-block;
+        margin-bottom: 0;
+        font-weight: regular;
+        text-align: center;
+        vertical-align: middle;
+        line-height: 1;
+        cursor: pointer;
+        background-image: none;
+        box-shadow: none;
+        white-space: nowrap;
+        border: 0;
+        padding: 5px 10px;
+        font-size: 11px;
+        border-radius: 3px;
+      }
+      .alert {
+        background-color: 10px;
+        font-size: 12px;
+        border-radius: 0.25rem;
+        padding: 6px 5px 6px 5px;
+        min-width: rem(480px);
+        position: relative;
+        font-weight: 300;
+        border: none;
+        color: #a94442;
+        box-sizing: border-box;
+        display: none;
+      }
+      .alertmessage {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        font-size: 12px;
+        display: inline-block;
+        text-align: left;
+        word-break: break-word;
+        font-family: Arial;
+        box-sizing: border-box;
+        color: #fff;
+        background-color: #c23934;
+        border: 1px solid #999999;
+        padding: 5px;
+      }
+      textarea {
+        width: 100%;
+      }
+      .textwrapper {
+        border: 1px solid #999999;
+        margin: 5px 0;
+        padding: 3px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div style="width: 100%; height: 80%">
+      <div class="textwrapper">
+        <textarea
+          style="width: 100%; height: 80%"
+          placeholder="Enter MJML Source Code"
+          id="editing"
+          spellcheck="true"
+        ></textarea>
+      </div>
+      <div style="padding-top: 5px">
+        <div class="alert" id="alertBox">
+          <div style="width: 100%" class="alertmessage">
+            <span
+              class="close"
+              style="float: right; position: relative; top: 3px; right: 3px"
+              >&times;</span
+            >
+            <div style="top: 10px" id="errorMsg"></div>
+          </div>
+        </div>
+      </div>
+      <div style="padding-top: 5px">
+        <div>
+          <input class="btn" type="button" value="Render" id="renderBtn" />
+          <input
+            class="btn"
+            type="button"
+            value="Starwars Template"
+            style="float: right; margin: 5px"
+            id="starwarsMjml"
+            onclick="mjmlStarWarsTemplate()"
+          />
+          <input
+            class="btn"
+            type="button"
+            value="MJML Hello world"
+            style="float: right; margin: 5px"
+            id="demoMjml"
+            onclick="mjmlHelloWorld()"
+          />
+        </div>
+      </div>
+    </div>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="blocksdk.js"></script>
+    <script>
+      /* Code mirror script */
+      var elt = document.getElementById("editing");
+      var myCodeMirror = CodeMirror.fromTextArea(elt, {
+        lineNumbers: true,
+        mode: "xml",
+        htmlMode: true,
+        lineSeparator: null,
+        theme: "default",
+        indentUnit: 2,
+        tabSize: 4,
+        indentWithTabs: true,
+        lineWrapping: true,
+        tabindex: 1,
+        autofocus: true,
+        gutter: true,
+        lineWrapping: true,
+        autoRefresh: true,
+      });
+      myCodeMirror.setSize("100%", "100%");
+      myCodeMirror.refresh();
+    </script>
+    <script>
+      var textAreaContent;
+      var errMsg;
+      var debug = true;
+
+      const debounce = (fn, delay) => {
+        let timeOutID;
+        return function (...args) {
+          if (timeOutID) {
+            clearTimeout(timeOutID);
+          }
+          timeOutID = setTimeout(() => {
+            fn(...args);
+          }, delay);
+        };
+      };
+
+      var sdk = new window.sfdc.BlockSDK({
+        blockEditorWidth: 500,
+        tabs: [
+        "htmlblock",
+          {
+            name: "Code Snippets",
+            key: "codeSnippets",
+            url: "https://test-contentsdk.herokuapp.com/CodeSnippets.html",
+          },
+          /* , {
+        name: 'API Details',
+        key: 'mjmlAPIConfig',
+        url: 'https://test-contentsdk.herokuapp.com/mjmlAPIConfig.html'
+      }*/
+          "stylingblock"
+        ],
+      });
+
+      /* Reset Everything */
+      document.getElementById("alertBox").style.display = "none";
+      document.getElementById("errorMsg").innerHTML = "";
+      sdk.setBlockEditorWidth(500, function (data) {
+        consoleprint(
+          debug,
+          "109. Block width set to 500. Data received " + data
+        );
+      });
+
+      var username = "ac431a44-da36-4958-8d64-e85eff349881";
+      var password = "d702e374-3670-4d14-9dab-a23dfbe9ed07";
+
+      sdk.getContent(function (content) {
+        consoleprint(debug, "354. Content in first get content " + content);
+        if (content) {
+          sdk.setContent(content, function (setContent) {
+            consoleprint(
+              debug,
+              "357. Content Found in first get content " + content
+            );
+          });
+        } else {
+          sdk.setContent(
+            "356. No html available to preview",
+            function (setContent) {
+              //if no html found, check if getdata has the value
+              sdk.getData(function (data) {
+                if (data["html"]) {
+                  sdk.setContent(data["html"]);
+                } else {
+                  sdk.setContent("");
+                }
+              });
+              consoleprint(
+                debug,
+                "361. Content NOT FOUND in first get content " + content
+              );
+            }
+          );
+        }
+      });
+
+      sdk.getData(function (data) {
+        if (!isEmptyObject(data) && data["mjml"]) {
+          //MJML data
+          //TODO: If data is empty object, {} - then skip it.
+          //document.getElementById('editing').value = data.mjml;
+          myCodeMirror.setValue(data.mjml);
+          consoleprint(
+            debug,
+            "does this have API details - Get Data : " + JSON.stringify(data)
+          );
+        }
+
+        consoleprint(debug, "Retreiving uname & pwd");
+        if (!username && !password) {
+          if (data["username"] && data["password"]) {
+            username = data["username"];
+            password = data["password"];
+          } else {
+            document.getElementById("alertBox").style.display = "block";
+            document.getElementById("errorMsg").innerHTML =
+              "Please enter/ save API details";
+            consoleprint(debug, "Please enter/ save API details");
+            throw "API details unavailable";
+          }
+        }
+      });
+
+      sdk.getUserData(function (userData) {
+        consoleprint(debug, "Get User Data : " + JSON.stringify(userData));
+      });
+
+      function mjmlHelloWorld() {
+        var helloWorldmjml = `<mjml>
+<mj-body>
+  <mj-section>
+    <mj-column>
+      <mj-divider border-color="#F45E43"></mj-divider>
+      <mj-text font-size="20px" color="#F45E43" font-family="helvetica">Hello World</mj-text>
+    </mj-column>
+  </mj-section>
+</mj-body>
+</mjml>`;
+        //document.getElementById('editing').value = helloWorldmjml;
+        myCodeMirror.setValue(helloWorldmjml);
+
+        //sdk.setSuperContent(helloWorldmjml);
+        sdk.getContent(function (data) {
+          data["mjml"] = helloWorldmjml;
+          sdk.setContent(
+            "401. Preview not available. Please click on render to generate HTML preview."
+          ); //Always set only html in setcontent
+          consoleprint(debug, "401. Content data in render function " + data);
+        });
+        sdk.getData(function (data) {
+          data["mjml"] = helloWorldmjml;
+          data["html"] = renderMjml();
+          sdk.setData(data);
+        });
+      }
+
+      function mjmlStarWarsTemplate() {
+        var mjmlStarWars = `<mjml>
+  <mj-head>
+    <mj-title>These are the Droids you're looking for</mj-title>
+  </mj-head>
+  <mj-body>
+    <mj-raw>
+      <!-- Hero image -->
+    </mj-raw>
+    <mj-section background-color="#000000" padding="0px">
+      <mj-column>
+        <mj-image src="https://dmmedia.sphero.com/email-marketing/Star-Wars/Star_Wars_Launch_Email_1_REAL_Hero.jpg" alt="These Are The Droids You're Looking For" href="https://www.youtube.com/sphero" padding="0px"></mj-image>
+      </mj-column>
+    </mj-section>
+    <mj-raw>
+      <!-- Features Section -->
+    </mj-raw>
+    <mj-section background-color="#000000">
+      <mj-column>
+        <mj-image src="https://dmmedia.sphero.com/email-marketing/Star-Wars/Star_Wars_Launch_Email_1_features.jpg" alt="Featuring Authentic Movement, Holographic Simulation, Droid to Droid Experience, and Watch With Me" padding="0px"></mj-image>
+      </mj-column>
+    </mj-section>
+    <mj-raw>
+      <!-- R2-D2 Section -->
+    </mj-raw>
+    <mj-section background-color="#000000" background-url="https://dmmedia.sphero.com/email-marketing/Star-Wars/Star_Wars_Launch_Email_1.r2BG.jpg" background-repeat="no-repeat" padding-top="80px" padding-bottom="0px" padding-left="20px">
+      <mj-column>
+        <mj-spacer height="15px"></mj-spacer>
+        <mj-image src="https://dmmedia.sphero.com/email-marketing/Star-Wars/Star_Wars_Launch_Email_1_R2text.png" width="196px" alt="Buy R2D2" href="https://www.sphero.com/starwars/r2d2"></mj-image>
+        <mj-text font-size="14px" line-height="2" align="left" color="#ffffff" font-family="Helvetica Neue">This is the Droid™ you’re looking for. R2-D2™ is an Astromech Droid™ in the Rebel Alliance from a galaxy far, far away.... The specialized tech in R2-D2 is unlike any other Astromech Droid, making it as authentic as the trusty Artoo you’ve come
+          to know and love.</mj-text>
+        <mj-spacer height="5px"></mj-spacer>
+        <mj-image src="https://dmmedia.sphero.com/email-marketing/Star-Wars/Star_Wars_Launch_Email_1_R2_button.png" width="129px" alt="Buy R2-D2" href="https://store.sphero.com/products/r2-d2"></mj-image>
+      </mj-column>
+      <mj-column>
+        <mj-spacer height="45px"></mj-spacer>
+        <mj-image src="https://dmmedia.sphero.com/email-marketing/Star-Wars/Star_Wars_Launch_Email_1_R2-D2.png" href="https://www.sphero.com/starwars/r2d2" alt="Get the new R2-D2" width="310px" padding="0px"></mj-image>
+      </mj-column>
+    </mj-section>
+    <mj-raw>
+      <!-- BB-9E Section -->
+    </mj-raw>
+    <mj-section background-color="#000000" background-url="https://dmmedia.sphero.com/email-marketing/Star-Wars/Star_Wars_Launch_Email_1REDbg.jpg" background-repeat="no-repeat" padding-left="20px">
+      <mj-column>
+        <mj-spacer height="37px"></mj-spacer>
+        <mj-image src="https://dmmedia.sphero.com/email-marketing/Star-Wars/Star_Wars_Launch_Email_1_BB-9E-text.png" width="196px" alt="Buy BB-9E" href="https://www.sphero.com/starwars/bb9e"></mj-image>
+        <mj-text font-size="14px" align="left" color="#ffffff" line-height="2" font-family="Helvetica Neue">There’s a new disturbance in the Force. BB-9E™ is a menacing Astromech Droid of the First Order. This vigilant and intimidating Droid is always on high alert. This is NOT the Droid you’re looking for… it’s the Droid that’s looking for you.</mj-text>
+        <mj-spacer height="30px"></mj-spacer>
+        <mj-image src="https://dmmedia.sphero.com/email-marketing/Star-Wars/Star_Wars_Launch_Email_1_BB-9E-button.png" width="129px" alt="Buy BB-9E" href="https://store.sphero.com/products/bb-9e"></mj-image>
+      </mj-column>
+      <mj-column>
+        <mj-spacer height="60px"></mj-spacer>
+        <mj-image src="https://dmmedia.sphero.com/email-marketing/Star-Wars/Star_Wars_Launch_Email_1_bb9e.png" href="https://www.sphero.com/starwars/bb9e" alt="Get the new BB-9E" width="310px" padding="0px"></mj-image>
+      </mj-column>
+    </mj-section>
+    <mj-raw>
+      <!-- BB-8 Section -->
+    </mj-raw>
+    <mj-section background-color="#000000" background-url="https://dmmedia.sphero.com/email-marketing/Star-Wars/Star_Wars_Launch_Email_1_OrangeBG.jpg" background-repeat="no-repeat" padding-top="0" padding-left="20px">
+      <mj-column>
+        <mj-spacer height="85px"></mj-spacer>
+        <mj-image src="https://dmmedia.sphero.com/email-marketing/Star-Wars/Star_Wars_Launch_Email_1_bb8-text.png" width="196px" alt="Buy BB-8" href="https://www.sphero.com/starwars/bb8"></mj-image>
+        <mj-text font-size="14px" align="left" color="#ffffff" line-height="2" font-family="Helvetica Neue">Orange and white. One of a kind. BB-8™ is the loyal Astromech Droid of Resistance pilot Poe Dameron. The specially designed technology in this unique BB unit makes it invaluable to the Resistance. This Droid is full of features and will stop at
+          nothing to complete its mission.</mj-text>
+        <mj-spacer height="50px"></mj-spacer>
+        <mj-image src="https://dmmedia.sphero.com/email-marketing/Star-Wars/Star_Wars_Launch_Email_1_bb8-button.png" width="129px" href="https://store.sphero.com/products/bb-8-with-trainer" alt="Buy BB-8"></mj-image>
+      </mj-column>
+      <mj-column>
+        <mj-spacer height="55px"></mj-spacer>
+        <mj-image src="https://dmmedia.sphero.com/email-marketing/Star-Wars/Star_Wars_Launch_Email_1_bb8.png" href="https://www.sphero.com/starwars/bb8" width="310px" alt="Get the new BB-8" padding="0px"></mj-image>
+        <mj-spacer height="155px"></mj-spacer>
+      </mj-column>
+    </mj-section>
+    <mj-raw>
+      <!-- Bottom Bar -->
+    </mj-raw>
+    <mj-section background-color="#424143" padding-right="10px" padding-top="0" padding-bottom="0px">
+      <mj-column width="33.33333333333333%"></mj-column>
+      <mj-column width="33.33333333333333%">
+        <mj-image src="https://dmmedia.sphero.com/email-marketing/Star-Wars/sphero-logo-bottom-gray.png" href="https://www.sphero.com" width="134px" align="center"></mj-image>
+      </mj-column>
+      <mj-column width="33.33333333333333%">
+        <mj-text align="center" color="#ffffff" font-size="10px">&copy; & &trade; Lucasfilm Ltd.</mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>`;
+        myCodeMirror.setValue(mjmlStarWars);
+
+        //sdk.setSuperContent(mjmlStarWars);
+        sdk.getContent(function (data) {
+          data["mjml"] = mjmlStarWars;
+          sdk.setContent(
+            "507. Preview not available. Please click on render to generate HTML preview."
+          );
+          consoleprint(debug, "508. Content data in render function " + data);
+        });
+        sdk.getData(function (data) {
+          data["mjml"] = mjmlStarWars;
+          data["html"] = renderMjml();
+          sdk.setData(data);
+        });
+      }
+
+      function renderMjml () {
+        document.getElementById("errorMsg").innerHTML = "";
+        document.getElementById("alertBox").style.display = "none";
+
+        var textAreaContent = myCodeMirror.getValue();
+        var mjmlRenderedContent = "";
+
+        sdk.getData(function (data) {
+          data["mjml"] = textAreaContent;
+          sdk.setData(data);
+          sdk.setContent(
+            '<div style="font-size:12px;font-family:Arial">...</div>'
+          ); //Clear the content and set value
+        });
+
+
+        //var mjml2html = require('mjml')
+        //var mjmlModule = require('./index')
+        //let htmlOutput = mjml2html(textAreaContent, {});
+        //console.log(htmlOutput['html'])
+
+
+        // MK123 - This is local rendering
+        console.log("LOCAL RENDERING!!!!")
+        var htmlOutput = mjml(textAreaContent);
+        
+        //document.getElementById('renderedHTML').innerHTML = htmlOutput.html
+        if(htmlOutput.html.length > 0) { 
+          console.log(htmlOutput.html)
+          sdk.getContent(function (content) {
+            sdk.setContent(htmlOutput.html); //Always set only html in setcontent
+            consoleprint(
+              debug,
+              "554. Content in render function " + htmlOutput.html
+            );
+          });
+
+          sdk.getData(function (data) {
+            data["mjml"] = textAreaContent;
+            data["html"] = htmlOutput.html;
+            sdk.setData(data);
+            consoleprint(
+              debug,
+              "568 . content in render function for getdata " + data
+            );
+          });
+        }
+
+/*        var url = "https://api.mjml.io/v1/render";
+        var payload = {
+          mjml: textAreaContent,
+        };
+        var authToken = "Basic " + btoa(username + ":" + password);
+        var headers = { Authorization: authToken };
+
+        consoleprint(debug, "Make post call to \n " + url);
+        axios({
+          method: "post",
+          url: url,
+          data: payload,
+          headers: headers,
+        })
+          .then((result) => {
+            consoleprint(debug, result); //To see full result
+            if (result.status == 200) {
+              consoleprint(debug, "HTML received");
+              //consoleprint(debug, result.data.html)
+              mjmlRenderedContent = result.data.html;
+              consoleprint(
+                debug,
+                "HTML content to be rendered " + result.data.html
+              );
+              sdk.getContent(function (content) {
+                sdk.setContent(result.data.html); //Always set only html in setcontent
+                consoleprint(
+                  debug,
+                  "554. Content in render function " + result.data.html
+                );
+              });
+
+              sdk.getData(function (data) {
+                data["mjml"] = textAreaContent;
+                data["html"] = mjmlRenderedContent;
+                sdk.setData(data);
+                consoleprint(
+                  debug,
+                  "568 . content in render function for getdata " + data
+                );
+              });
+              //return result.data.html
+              //Handle if MJML repsonse had any errors.
+              if (result.data.errors.length > 0) {
+                var errs = result.data.errors;
+
+                errMsg =
+                  "Line #" + errs[0].line + "\t" + errs[0].message + "\n"; //To avoid 'undefined' from appended
+                for (var e = 1; e < errs.length; e++) {
+                  errMsg +=
+                    "Line #" + errs[e].line + "\t" + errs[e].message + "\n";
+                  consoleprint(debug, errs[e]);
+                }
+                document.getElementById("alertBox").style.display = "block";
+                document.getElementById("errorMsg").innerText = errMsg;
+              }
+            } else if (result.status == 400) {
+              consoleprint(debug, "Received 400");
+              consoleprint(debug, result.data);
+
+              sdk.getData(function (data) {
+                if (data["html"]) {
+                  sdk.setContent(data["html"]);
+                } else {
+                  sdk.setContent("589 . HTML not available to show a preview");
+                }
+                sdk.setData(data);
+              });
+              //Display Error - {"message":"[MJMLError]: Something went wrong","request_id":"115e1295-c3cb-4c93-aa30-53f99300c987","started_at":"2022-03-29T18:42:06Z"}
+              errMsg = result.data.message;
+              document.getElementById("alertBox").style.display = "block";
+              document.getElementById("errorMsg").innerText = errMsg;
+
+            }
+            else {
+              consoleprint(debug, "HTML Not received");
+              consoleprint(debug, result.data.errors);
+
+              sdk.getData(function (data) {
+                if (data["html"]) {
+                  sdk.setContent(data["html"]);
+                } else {
+                  sdk.setContent("589 . HTML not available to show a preview");
+                }
+                sdk.setData(data);
+              });
+            }
+          })
+          .catch((result) => {
+            consoleprint(debug, "Error rendering");
+            consoleprint(debug, result.message);
+            consoleprint(debug, JSON.stringify(result));
+            consoleprint(debug, result);
+
+            //Specific scenario where mj-include not supported
+            errMsg = result.message;
+            errMsg += (textAreaContent.indexOf('mj-include') > -1 ? '. Please note that mj-include is not supported in API calls.' : '');
+
+            document.getElementById("alertBox").style.display = "block";
+            document.getElementById("errorMsg").innerText = errMsg;
+          });
+
+          */ 
+
+        return true;
+      }
+      //Event Listener
+      document
+        .getElementById("renderBtn")
+        .addEventListener("click", function () {
+          renderMjml();
+        });
+
+      document.getElementById("editing").addEventListener(
+        "input",
+        debounce((e) => {
+          /*document.getElementById("div-0").innerHTML =
+          '<font face="verdana">(' +
+          document.getElementById("editing").value.length +
+          "/4000) " +
+          (4000 - document.getElementById("editing").value.length) +
+          " characters left." +
+          "</font>";*/
+          renderMjml();
+        }, 5000)
+      );
+      /* document.getElementById("div-0").innerHTML =
+      '<font face="verdana">(' +
+      document.getElementById("editing").value.length +
+      "/4000) " +
+      (4000 - document.getElementById("editing").value.length) +
+      " characters left." +
+      "</font>"; */
+    </script>
+
+    <script>
+      function isEmptyObject(obj) {
+        for (var i in obj) return false;
+        return true;
+      }
+      function consoleprint(debug, msg) {
+        debug ? console.log(msg) : "";
+      }
+
+      /* close button in error msg */
+      var closebtns = document.getElementsByClassName("close");
+      var i;
+
+      for (i = 0; i < closebtns.length; i++) {
+        closebtns[i].addEventListener("click", function () {
+          this.parentElement.parentElement.style.display = "none";
+        });
+      }
+
+    </script>
+  </body>
+</html>
