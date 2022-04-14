@@ -400,16 +400,16 @@
         //var mjml2html = require('mjml')
         //var mjmlModule = require('./index')
         //let htmlOutput = mjml2html(textAreaContent, {});
-        //consoleprint(htmlOutput['html'])
+        //consoleprint(debug,htmlOutput['html'])
 
 
         // MK123 - This is local rendering
-        consoleprint("LOCAL RENDERING!!!!")
+        consoleprint(debug,"LOCAL RENDERING!!!!")
         var htmlOutput = mjml(textAreaContent);
         
         //document.getElementById('renderedHTML').innerHTML = htmlOutput.html
         if(htmlOutput.html.length > 0) { 
-          consoleprint(htmlOutput.html)
+          consoleprint(debug,htmlOutput.html)
           sdk.getContent(function (content) {
             sdk.setContent(htmlOutput.html); //Always set only html in setcontent
             consoleprint(
