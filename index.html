@@ -155,7 +155,6 @@
           }, delay);
         };
       };
-      console.log('Heroku app name ' + process.env.HEROKU_APP_NAME);
       var sdk = new window.sfdc.BlockSDK({
         blockEditorWidth: 500,
         tabs: [
@@ -163,7 +162,7 @@
           {
             name: "Code Snippets",
             key: "codeSnippets",
-            url: "https://"+process.env.HEROKU_APP_NAME+".herokuapp.com/CodeSnippets.html",
+            url: "https://mjmlrender.herokuapp.com/CodeSnippets.html",
           },
           /* , {
         name: 'API Details',
