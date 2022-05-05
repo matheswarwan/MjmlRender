@@ -177,23 +177,14 @@
       document.getElementById("alertBox").style.display = "none";
       document.getElementById("errorMsg").innerHTML = "";
       sdk.setBlockEditorWidth(500, function (data) {
-        consoleprint(
-          debug,
-          "109. Block width set to 500. Data received " + data
-        );
       });
 
       var username = "ac431a44-da36-4958-8d64-e85eff349881";
       var password = "d702e374-3670-4d14-9dab-a23dfbe9ed07";
 
       sdk.getContent(function (content) {
-        consoleprint(debug, "354. Content in first get content " + content);
         if (content) {
           sdk.setContent(content, function (setContent) {
-            consoleprint(
-              debug,
-              "357. Content Found in first get content " + content
-            );
           });
         } else {
           sdk.setContent(
@@ -207,10 +198,6 @@
                   sdk.setContent("");
                 }
               });
-              consoleprint(
-                debug,
-                "361. Content NOT FOUND in first get content " + content
-              );
             }
           );
         }
@@ -218,17 +205,9 @@
 
       sdk.getData(function (data) {
         if (!isEmptyObject(data) && data["mjml"]) {
-          //MJML data
-          //TODO: If data is empty object, {} - then skip it.
-          //document.getElementById('editing').value = data.mjml;
           myCodeMirror.setValue(data.mjml);
-          consoleprint(
-            debug,
-            "does this have API details - Get Data : " + JSON.stringify(data)
-          );
         }
 
-        consoleprint(debug, "Retreiving uname & pwd");
         if (!username && !password) {
           if (data["username"] && data["password"]) {
             username = data["username"];
@@ -237,14 +216,12 @@
             document.getElementById("alertBox").style.display = "block";
             document.getElementById("errorMsg").innerHTML =
               "Please enter/ save API details";
-            consoleprint(debug, "Please enter/ save API details");
             throw "API details unavailable";
           }
         }
       });
 
       sdk.getUserData(function (userData) {
-        consoleprint(debug, "Get User Data : " + JSON.stringify(userData));
       });
 
       function mjmlHelloWorld() {
@@ -267,7 +244,6 @@
           sdk.setContent(
             "401. Preview not available. Please click on render to generate HTML preview."
           ); //Always set only html in setcontent
-          consoleprint(debug, "401. Content data in render function " + data);
         });
         sdk.getData(function (data) {
           data["mjml"] = helloWorldmjml;
@@ -371,7 +347,6 @@
           sdk.setContent(
             "507. Preview not available. Please click on render to generate HTML preview."
           );
-          consoleprint(debug, "508. Content data in render function " + data);
         });
         sdk.getData(function (data) {
           data["mjml"] = mjmlStarWars;
@@ -395,143 +370,20 @@
           ); //Clear the content and set value
         });
 
-
-        //var mjml2html = require('mjml')
-        //var mjmlModule = require('./index')
-        //let htmlOutput = mjml2html(textAreaContent, {});
-        //consoleprint(debug,htmlOutput['html'])
-
-
-        // MK123 - This is local rendering
-        consoleprint(debug,"LOCAL RENDERING!!!!")
         var htmlOutput = mjml(textAreaContent);
         
         //document.getElementById('renderedHTML').innerHTML = htmlOutput.html
         if(htmlOutput.html.length > 0) { 
-          consoleprint(debug,htmlOutput.html)
           sdk.getContent(function (content) {
-            sdk.setContent(htmlOutput.html); //Always set only html in setcontent
-            consoleprint(
-              debug,
-              "554. Content in render function " + htmlOutput.html
-            );
+            sdk.setContent(htmlOutput.html); 
           });
 
           sdk.getData(function (data) {
             data["mjml"] = textAreaContent;
             data["html"] = htmlOutput.html;
             sdk.setData(data);
-            consoleprint(
-              debug,
-              "568 . content in render function for getdata " + data
-            );
           });
         }
-
-/*        var url = "https://api.mjml.io/v1/render";
-        var payload = {
-          mjml: textAreaContent,
-        };
-        var authToken = "Basic " + btoa(username + ":" + password);
-        var headers = { Authorization: authToken };
-
-        consoleprint(debug, "Make post call to \n " + url);
-        axios({
-          method: "post",
-          url: url,
-          data: payload,
-          headers: headers,
-        })
-          .then((result) => {
-            consoleprint(debug, result); //To see full result
-            if (result.status == 200) {
-              consoleprint(debug, "HTML received");
-              //consoleprint(debug, result.data.html)
-              mjmlRenderedContent = result.data.html;
-              consoleprint(
-                debug,
-                "HTML content to be rendered " + result.data.html
-              );
-              sdk.getContent(function (content) {
-                sdk.setContent(result.data.html); //Always set only html in setcontent
-                consoleprint(
-                  debug,
-                  "554. Content in render function " + result.data.html
-                );
-              });
-
-              sdk.getData(function (data) {
-                data["mjml"] = textAreaContent;
-                data["html"] = mjmlRenderedContent;
-                sdk.setData(data);
-                consoleprint(
-                  debug,
-                  "568 . content in render function for getdata " + data
-                );
-              });
-              //return result.data.html
-              //Handle if MJML repsonse had any errors.
-              if (result.data.errors.length > 0) {
-                var errs = result.data.errors;
-
-                errMsg =
-                  "Line #" + errs[0].line + "\t" + errs[0].message + "\n"; //To avoid 'undefined' from appended
-                for (var e = 1; e < errs.length; e++) {
-                  errMsg +=
-                    "Line #" + errs[e].line + "\t" + errs[e].message + "\n";
-                  consoleprint(debug, errs[e]);
-                }
-                document.getElementById("alertBox").style.display = "block";
-                document.getElementById("errorMsg").innerText = errMsg;
-              }
-            } else if (result.status == 400) {
-              consoleprint(debug, "Received 400");
-              consoleprint(debug, result.data);
-
-              sdk.getData(function (data) {
-                if (data["html"]) {
-                  sdk.setContent(data["html"]);
-                } else {
-                  sdk.setContent("589 . HTML not available to show a preview");
-                }
-                sdk.setData(data);
-              });
-              //Display Error - {"message":"[MJMLError]: Something went wrong","request_id":"115e1295-c3cb-4c93-aa30-53f99300c987","started_at":"2022-03-29T18:42:06Z"}
-              errMsg = result.data.message;
-              document.getElementById("alertBox").style.display = "block";
-              document.getElementById("errorMsg").innerText = errMsg;
-
-            }
-            else {
-              consoleprint(debug, "HTML Not received");
-              consoleprint(debug, result.data.errors);
-
-              sdk.getData(function (data) {
-                if (data["html"]) {
-                  sdk.setContent(data["html"]);
-                } else {
-                  sdk.setContent("589 . HTML not available to show a preview");
-                }
-                sdk.setData(data);
-              });
-            }
-          })
-          .catch((result) => {
-            consoleprint(debug, "Error rendering");
-            consoleprint(debug, result.message);
-            consoleprint(debug, JSON.stringify(result));
-            consoleprint(debug, result);
-
-            //Specific scenario where mj-include not supported
-            errMsg = result.message;
-            errMsg += (textAreaContent.indexOf('mj-include') > -1 ? '. Please note that mj-include is not supported in API calls.' : '');
-
-            document.getElementById("alertBox").style.display = "block";
-            document.getElementById("errorMsg").innerText = errMsg;
-          });
-
-          */ 
-
         return true;
       }
       //Event Listener
@@ -545,23 +397,11 @@
         "input",
         debounce((e) => {
           console.log('debounced element ' + JSON.stringify(e));
-          /*document.getElementById("div-0").innerHTML =
-          '<font face="verdana">(' +
-          document.getElementById("editing").value.length +
-          "/4000) " +
-          (4000 - document.getElementById("editing").value.length) +
-          " characters left." +
-          "</font>";*/
+          
           renderMjml();
         }, 500)
       );
-      /* document.getElementById("div-0").innerHTML =
-      '<font face="verdana">(' +
-      document.getElementById("editing").value.length +
-      "/4000) " +
-      (4000 - document.getElementById("editing").value.length) +
-      " characters left." +
-      "</font>"; */
+      
     </script>
 
     <script>
