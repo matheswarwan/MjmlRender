@@ -68,7 +68,108 @@ mjmlText =
         </mj-section>
     </mj-body>
 </mjml>`
-,
+,`<mjml>
+<mj-head>
+  <mj-breakpoint width="320px" />
+</mj-head>
+<mj-body>
+  <mj-section>
+    <mj-column>
+      <mj-text>
+        Hello World!
+      </mj-text>
+    </mj-column>
+  </mj-section>
+</mj-body>
+</mjml>`
+,`<mjml>
+<mj-head>
+  <mj-font name="Raleway"
+    href="https://fonts.googleapis.com/css?family=Raleway" />
+</mj-head>
+<mj-body>
+  <mj-section>
+    <mj-column>
+      <mj-text font-family="Raleway, Arial">
+        Hello World!
+      </mj-text>
+    </mj-column>
+   </mj-section>
+</mj-body>
+</mjml>`
+,`<mjml>
+<mj-head>
+  <mj-html-attributes>
+    <mj-selector path=".custom div">
+      <mj-html-attribute name="data-id">42</mj-html-attribute>
+    </mj-selector>
+  </mj-html-attributes>
+</mj-head>
+<mj-body>
+  <mj-section>
+    <mj-column>
+      <mj-text css-class="custom">
+        Hello World!
+      </mj-text>
+    </mj-column>
+  </mj-section>
+</mj-body>
+</mjml>`
+,`<mjml>
+<mj-head>
+  <mj-preview>Hello MJML</mj-preview>
+</mj-head>
+<mj-body>
+  <mj-section>
+    <mj-column>
+      <mj-text>
+        Hello World!           
+      </mj-text>
+    </mj-column>
+  </mj-section>
+</mj-body>
+</mjml>`,
+`<mjml>
+<mj-head>
+  <mj-attributes>
+    <mj-class name="mjclass" color="green" font-size="30px" />
+  </mj-attributes>
+  <mj-style inline="inline">
+    .blue-text div {
+      color: blue !important;
+    }
+  </mj-style>
+  <mj-style>
+    .red-text div {
+      color: red !important;
+      text-decoration: underline !important;
+    }
+  </mj-style>
+</mj-head>
+<mj-body>
+  <mj-section>
+    <mj-column>
+      <mj-text css-class="red-text">I'm red and underlined</mj-text>
+      <mj-text css-class="blue-text">I'm blue because of inline</mj-text>
+      <mj-text mj-class="mjclass">I'm green</mj-text>
+    </mj-column>
+  </mj-section>
+</mj-body>
+</mjml>`
+,`<mjml>
+<mj-head>
+  <mj-title>Hello MJML</mj-title>
+</mj-head>
+<mj-body>
+  <mj-section>
+    <mj-column>
+      <mj-text>
+        Hello World!
+      </mj-text>
+    </mj-column>
+  </mj-section>
+</mj-body>
+</mjml>`, 
 `<mjml>
 <mj-head>
   <mj-attributes>

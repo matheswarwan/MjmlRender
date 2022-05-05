@@ -388,7 +388,7 @@
           } else {
             document.getElementById("errorMsg").innerHTML = "";
             document.getElementById("alertBox").style.display = "block";
-            document.getElementById("errorMsg").innerHTML = "[ERROR]: Not a valid MJML content.";
+            document.getElementById("errorMsg").innerHTML = "[ERROR]: Not a valid MJML document/ component.";
             for(e in htmlOutput.errors) {
               document.getElementById("errorMsg").innerHTML += 'Line #' + htmlOutput.errors[e].line + ": [" + htmlOutput.errors[e].tagName + "] " + htmlOutput.errors[e].message + "<br>";
             }
@@ -398,7 +398,7 @@
           console.log(e);
           document.getElementById("errorMsg").innerHTML = "";
           document.getElementById("alertBox").style.display = "block";
-          document.getElementById("errorMsg").innerHTML = "[ERROR]: Not a valid MJML content.";
+          document.getElementById("errorMsg").innerHTML = "[ERROR]: Not a valid MJML document/ component.";
             
         }
         return true;
