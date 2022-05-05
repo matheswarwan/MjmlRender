@@ -1,15 +1,17 @@
 mjmlTitle = [
-    'mj-body',
-    'mj-include',
-    'mj-attribute',
-    'mj-accordian',
-    'mj-button',
-    'mj-image',
-    'mj-social'
+  'mjml',
+  'mj-body',
+  'mj-include',
+  'mj-attribute',
+  'mj-accordian',
+  'mj-button',
+  'mj-image',
+  'mj-social'
 ]
 
 mjmlDescription = [
-    `This is the starting point of your email.`
+    `A MJML document starts with a <code>&lt;mjml&gt;</code> tag, it can contain only <code>&lt;mj-head&gt;</code> and <code>&lt;mj-body&gt;</code> tags. Both have the same purpose of head and body in a HTML document.`
+    ,`This is the starting point of your email.`
     ,`The <code>mjml-core</code> package allows you to include external mjml files to build your email template.`
     ,`Inside <code>mj-attributes</code>, a tag citing one MJML component (like <code>mj-text</code>; see example) overrides default settings for listed MJML attributes on the one component.`
     ,`<code>mj-accordion</code> is an interactive MJML component to stack content in tabs, so the information is collapsed and only the titles are visible. Readers can interact by clicking on the tabs to reveal the content, providing a great experience on mobile devices where space is scarce.`
@@ -19,7 +21,8 @@ mjmlDescription = [
 ]
 
 mjmlText = 
-[`<mjml>
+[
+`<mjml>
     <mj-body>
         <!-- Your email goes here -->
     </mj-body>
@@ -149,6 +152,28 @@ mjmlText =
 </mjml>`
 ,`<mjml>
 <mj-body>
+  <mj-section>
+    <mj-group>
+      <mj-column>
+        <mj-image width="137px" height="185px" padding="0"    src="https://mjml.io/assets/img/easy-and-quick.png" />
+        <mj-text align="center">
+          <h2>Easy and quick</h2>
+          <p>Write less code, save time and code more efficiently with MJML’s semantic syntax.</p>
+        </mj-text>
+      </mj-column>
+      <mj-column>
+        <mj-image width="166px" height="185px" padding="0" src="https://mjml.io/assets/img/responsive.png" />
+        <mj-text align="center">
+          <h2>Responsive</h2>
+          <p>MJML is responsive by design on most-popular email clients, even Outlook.</p>
+        </mj-text>
+      </mj-column>
+    </mj-group>
+  </mj-section>
+</mj-body>
+</mjml>`
+,`<mjml>
+<mj-body>
   <mj-hero
     mode="fixed-height"
     height="469px"
@@ -179,6 +204,20 @@ mjmlText =
   <mj-section>
     <mj-column>
       <mj-image width="300px" src="https://www.online-image-editor.com//styles/2014/images/example_image.png" />
+    </mj-column>
+  </mj-section>
+</mj-body>
+</mjml>`
+,`<mjml>
+<mj-body>
+  <mj-section background-color="#ef6451">
+    <mj-column>
+      <mj-navbar base-url="https://mjml.io" hamburger="hamburger" ico-color="#ffffff">
+          <mj-navbar-link href="/gettings-started-onboard" color="#ffffff">Getting started</mj-navbar-link>
+          <mj-navbar-link href="/try-it-live" color="#ffffff">Try it live</mj-navbar-link>
+          <mj-navbar-link href="/templates" color="#ffffff">Templates</mj-navbar-link>
+          <mj-navbar-link href="/components" color="#ffffff">Components</mj-navbar-link>
+      </mj-navbar>
     </mj-column>
   </mj-section>
 </mj-body>
