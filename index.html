@@ -142,7 +142,7 @@
     <script>
       var textAreaContent;
       var errMsg;
-      var debug = false;
+      var debug = true;
 
       const debounce = (fn, delay) => {
         let timeOutID;
@@ -544,6 +544,7 @@
       document.getElementById("editing").addEventListener(
         "input",
         debounce((e) => {
+          console.log('debounced element ' + JSON.stringify(e));
           /*document.getElementById("div-0").innerHTML =
           '<font face="verdana">(' +
           document.getElementById("editing").value.length +
@@ -552,7 +553,7 @@
           " characters left." +
           "</font>";*/
           renderMjml();
-        }, 5000)
+        }, 500)
       );
       /* document.getElementById("div-0").innerHTML =
       '<font face="verdana">(' +
