@@ -5,6 +5,7 @@
       href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap"
       rel="stylesheet"
     />
+    <meta http-equiv="Cache-control" content="No-Cache">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="CodeMirror/codemirror.js"></script>
     <link rel="stylesheet" href="CodeMirror/codemirror.css" />
@@ -115,7 +116,6 @@
         </div>
       </div>
     </div>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="blocksdk.js"></script>
     <script>
       /* Code mirror script */
@@ -173,9 +173,6 @@
       sdk.setBlockEditorWidth(500, function (data) {
       });
 
-      var username = "ac431a44-da36-4958-8d64-e85eff349881";
-      var password = "d702e374-3670-4d14-9dab-a23dfbe9ed07";
-
       sdk.getContent(function (content) {
         if (content) {
           sdk.setContent(content, function (setContent) {
@@ -200,18 +197,6 @@
       sdk.getData(function (data) {
         if (!isEmptyObject(data) && data["mjml"]) {
           myCodeMirror.setValue(data.mjml);
-        }
-
-        if (!username && !password) {
-          if (data["username"] && data["password"]) {
-            username = data["username"];
-            password = data["password"];
-          } else {
-            document.getElementById("alertBox").style.display = "block";
-            document.getElementById("errorMsg").innerHTML =
-              "Please enter/ save API details";
-            throw "API details unavailable";
-          }
         }
       });
 
