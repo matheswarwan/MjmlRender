@@ -123,7 +123,6 @@
     </div>
     <script src="blocksdk.js"></script>
     <script>
-      /* Code mirror script */
       var elt = document.getElementById("editing");
       var myCodeMirror = CodeMirror.fromTextArea(elt, {
         lineNumbers: true,
@@ -172,7 +171,6 @@
         ],
       });
 
-      /* Reset Everything */
       document.getElementById("alertBox").style.display = "none";
       document.getElementById("errorMsg").innerHTML = "";
       sdk.setBlockEditorWidth(500, function (data) {
@@ -186,7 +184,6 @@
           sdk.setContent(
             "356. No html available to preview",
             function (setContent) {
-              //if no html found, check if getdata has the value
               sdk.getData(function (data) {
                 if (data["html"]) {
                   sdk.setContent(data["html"]);
@@ -219,15 +216,13 @@
   </mj-section>
 </mj-body>
 </mjml>`;
-        //document.getElementById('editing').value = helloWorldmjml;
         myCodeMirror.setValue(helloWorldmjml);
 
-        //sdk.setSuperContent(helloWorldmjml);
         sdk.getContent(function (data) {
           data["mjml"] = helloWorldmjml;
           sdk.setContent(
-            "401. Preview not available. Please click on render to generate HTML preview."
-          ); //Always set only html in setcontent
+            "Preview not available. Please click on render to generate HTML preview."
+          ); 
         });
         sdk.getData(function (data) {
           data["mjml"] = helloWorldmjml;
@@ -325,7 +320,6 @@
 </mjml>`;
         myCodeMirror.setValue(mjmlStarWars);
 
-        //sdk.setSuperContent(mjmlStarWars);
         sdk.getContent(function (data) {
           data["mjml"] = mjmlStarWars;
           sdk.setContent(
@@ -351,7 +345,7 @@
           sdk.setData(data);
           sdk.setContent(
             '<div style="font-size:12px;font-family:Arial">...</div>'
-          ); //Clear the content and set value
+          ); 
         });
 
         try { 
@@ -393,7 +387,7 @@
         }
         return true;
       }
-      //Event Listener
+      
       document
         .getElementById("renderBtn")
         .addEventListener("click", function () {
@@ -418,7 +412,6 @@
         debug ? console.log(msg) : "";
       }
 
-      /* close button in error msg */
       var closebtns = document.getElementsByClassName("close");
       var i;
 
