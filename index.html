@@ -334,7 +334,7 @@
         });
       }
 
-      function renderMjml () {
+      function renderMjml() {
         document.getElementById("errorMsg").innerHTML = "";
         document.getElementById("alertBox").style.display = "none";
 
@@ -387,6 +387,31 @@
             
         }
         return true;
+      }
+      
+      function renderMjmlToHtml(mjmlText) {
+        var htmlText; 
+        try { 
+          var htmlOutput = mjml(mjmlText);
+          if(htmlOutput.html.length > 0) { 
+            htmlText = htmlOutput.html; 
+          }
+
+          if(htmlOutput.errors.length > 0){
+            document.getElementById("errorMsg").innerHTML = "";
+            document.getElementById("alertBox").style.display = "block";
+            for(e in htmlOutput.errors) {
+              document.getElementById("errorMsg").innerHTML += 'Line #' + htmlOutput.errors[e].line + ": [" + htmlOutput.errors[e].tagName + "] " + htmlOutput.errors[e].message + "<br>";
+            }
+          }
+        }
+        catch(e) { 
+          consoleprint(debug,e);
+          document.getElementById("errorMsg").innerHTML = "";
+          document.getElementById("alertBox").style.display = "block";
+          document.getElementById("errorMsg").innerHTML = "[ERROR]: Not a valid MJML document/ component."; 
+        }
+        return htmlText;
       }
       
       document
