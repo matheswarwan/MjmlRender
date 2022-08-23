@@ -192,8 +192,7 @@
           });
         } else {
           sdk.setContent(
-            //"356. No html available to preview",
-            renderMjmlToHtml(helloWorldmjml),
+            "No html available to preview",
             function (setContent) {
               sdk.getData(function (data) {
                 if (data["html"]) {
@@ -206,6 +205,8 @@
           );
         }
       });
+
+      mjmlHelloWorld();
 
       sdk.getData(function (data) {
         if (!isEmptyObject(data) && data["mjml"]) {
@@ -402,8 +403,7 @@
       }
       
       function renderMjmlToHtml(mjmlText) {
-        return 'The quick brown fox';
-        /*var htmlText; 
+        var htmlText; 
         try { 
           var htmlOutput = mjml(mjmlText);
           if(htmlOutput.html.length > 0) { 
@@ -426,7 +426,7 @@
         }
         console.log('Hello world HTML')
         console.log(htmlText)
-        return htmlText; */
+        return htmlText;
       }
       
       document
