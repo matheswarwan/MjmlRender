@@ -141,6 +141,7 @@
         autoRefresh: true,
       });
       myCodeMirror.setSize("100%", "100%");
+      myCodeMirror.on('change', renderMjml);
       myCodeMirror.refresh();
 
       var textAreaContent;
