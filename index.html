@@ -182,8 +182,10 @@
           });
         } else {
           sdk.setContent(
-            "356. No html available to preview",
-            function (setContent) {
+            //"No html available to preview",
+            getHelloWorldHTML(),
+            fnCallback(content)
+            /* function (setContent) {
               sdk.getData(function (data) {
                 if (data["html"]) {
                   sdk.setContent(data["html"]);
@@ -191,7 +193,7 @@
                   sdk.setContent("");
                 }
               });
-            }
+            } */
           );
         }
       });
@@ -204,6 +206,10 @@
 
       sdk.getUserData(function (userData) {
       });
+
+      function fnCallback(data) {
+        consoleprint(debug, content);
+      }
 
       function mjmlHelloWorld() {
         var helloWorldmjml = `<mjml>
@@ -331,6 +337,27 @@
           data["html"] = renderMjml();
           sdk.setData(data);
         });
+      }
+
+      function getHelloWorldHTML() {
+        var helloWorldmjml = `<mjml>
+<mj-body>
+  <mj-section>
+    <mj-column>
+      <mj-divider border-color="#F45E43"></mj-divider>
+      <mj-text font-size="20px" color="#F45E43" font-family="helvetica">Hello World</mj-text>
+    </mj-column>
+  </mj-section>
+</mj-body>
+</mjml>`;
+        try { 
+          var htmlOutput = mjml(helloWorldmjml);
+          if(htmlOutput.html.length > 0) { 
+            return htmlOutput.html
+          }
+        }catch(e){
+          consoleprint('Error: ' + e);
+        }
       }
 
       function renderMjml () {
