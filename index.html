@@ -233,7 +233,8 @@
         sdk.getContent(function (data) {
           data["mjml"] = helloWorldmjml;
           sdk.setContent(
-            "Preview not available. Please click on render to generate HTML preview."
+            //"Preview not available. Please click on render to generate HTML preview."
+            renderMjmlToHtml(helloWorldmjml)
           ); 
         });
         sdk.getData(function (data) {
@@ -424,8 +425,6 @@
           document.getElementById("alertBox").style.display = "block";
           document.getElementById("errorMsg").innerHTML = "[ERROR]: Not a valid MJML document/ component."; 
         }
-        console.log('Hello world HTML')
-        console.log(htmlText)
         return htmlText;
       }
       
