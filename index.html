@@ -179,6 +179,7 @@
       sdk.getContent(function (content) {
         if (content) {
           sdk.setContent(content, function (setContent) {
+            myCodeMirror.setValue(content);
           });
         } else {
           sdk.setContent(
