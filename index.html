@@ -238,7 +238,7 @@
         });
         sdk.getData(function (data) {
           data["mjml"] = helloWorldmjml;
-          data["html"] = renderMjml();
+          data["html"] = renderMjmlToHtml(helloWorldmjml);
           sdk.setData(data);
         });
 
