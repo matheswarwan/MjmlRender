@@ -187,15 +187,20 @@
                 console.log('data to be set in code mirror')
                 console.log(data["mjml"])
                 myCodeMirror.setValue(data["mjml"]);
-              } 
+              }
             });
           });
         } else {
+          var helloWorldmjml = getHelloWorldMJML();
+          var helloWorldHtml = getHelloWorldHTML();
           sdk.setContent(
             //"No html available to preview",
-            getHelloWorldHTML(),
+            helloWorldHtml,
             function (){
-              myCodeMirror.setValue(getHelloWorldMJML());
+              myCodeMirror.setValue(helloWorldmjml);
+              initialData["mjml"] = helloWorldmjml;
+              initialData["html"] = helloWorldHtml;
+              sdk.setData(initialData)
             }
             /* function (setContent) {
               sdk.getData(function (data) {
