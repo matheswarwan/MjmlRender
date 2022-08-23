@@ -182,11 +182,7 @@
           sdk.setContent(content, function (setContent) {
             //Get mjml data from getData and store it 
             sdk.getData(function (data) {
-              console.log('Data from initial load')
-              console.log(data)
               if(data & data["mjml"]) {
-                console.log('data to be set in code mirror')
-                console.log(data["mjml"])
                 myCodeMirror.setValue(data["mjml"]);
               }
             });
