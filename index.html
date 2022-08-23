@@ -101,8 +101,8 @@
       </div>
       <div style="padding-top: 5px">
         <div>
-          <input class="btn" type="button" value="Render" id="renderBtn" />
-          <input
+          <input class="btn" type="button" value="Generate" id="renderBtn" />
+          <!-- <input
             class="btn"
             type="button"
             value="Starwars Template"
@@ -117,7 +117,7 @@
             style="float: right; margin: 5px"
             id="demoMjml"
             onclick="mjmlHelloWorld()"
-          />
+          />-->
         </div>
       </div>
     </div>
@@ -182,7 +182,8 @@
           });
         } else {
           sdk.setContent(
-            "356. No html available to preview",
+            //"356. No html available to preview",
+            mjmlHelloWorld(),
             function (setContent) {
               sdk.getData(function (data) {
                 if (data["html"]) {
@@ -323,7 +324,7 @@
         sdk.getContent(function (data) {
           data["mjml"] = mjmlStarWars;
           sdk.setContent(
-            "507. Preview not available. Please click on render to generate HTML preview."
+            "Preview not available. Please click on render to generate HTML preview."
           );
         });
         sdk.getData(function (data) {
@@ -379,7 +380,7 @@
           }
         }
         catch(e) { 
-          console.log(e);
+          consoleprint(debug,e);
           document.getElementById("errorMsg").innerHTML = "";
           document.getElementById("alertBox").style.display = "block";
           document.getElementById("errorMsg").innerHTML = "[ERROR]: Not a valid MJML document/ component.";
@@ -397,7 +398,7 @@
       document.getElementById("editing").addEventListener(
         "input",
         debounce((e) => {
-          console.log('debounced element ' + JSON.stringify(e));
+          consoleprint(debug,'debounced element ' + JSON.stringify(e));
           
           renderMjml();
         }, 500)
