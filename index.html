@@ -179,7 +179,12 @@
       sdk.getContent(function (content) {
         if (content) {
           sdk.setContent(content, function (setContent) {
-            myCodeMirror.setValue(content);
+            //Get mjml data from getData and store it 
+            sdk.getData(function (data) {
+              if(data & data["mjml"]) {
+                myCodeMirror.setValue(data["mjml"]);
+              } 
+            });
           });
         } else {
           sdk.setContent(
