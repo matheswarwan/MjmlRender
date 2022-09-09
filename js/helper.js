@@ -14,7 +14,8 @@ gutter: true,
 lineWrapping: true,
 foldGutter: true,
 autoRefresh: true,
-gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
+gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+extraKeys: {"Ctrl-Q": function(cm){ cm.foldCode(cm.getCursor()); }}
 });
 myCodeMirror.setSize("100%", "100%");
 myCodeMirror.on('change', renderMjml);
@@ -265,11 +266,38 @@ try {
 }
 }
 
+function validateMjmlInput(textAreaContent) {
+    var htmlObject = document.createElement('div');
+    htmlObject.innerHTML = textAreaContent;
+    if( htmlObject.querySelector('mjml') == null && htmlObject.querySelector('mj-body') == null) {
+        textAreaContent = `<mjml><mj-body>` + textAreaContent + `</mj-body></mjml>`
+    }
+    return textAreaContent;
+}
+
+function sanitiseHtml(htmlOutput) { 
+    var htmlObject = document.createElement('div');
+    htmlObject.innerHTML = htmlOutput;
+    
+    htmlObject.querySelectorAll('meta').forEach(function(e) { 
+        htmlObject.removeChild(e) 
+    });
+    htmlObject.querySelectorAll('title').forEach(function(e) { 
+        htmlObject.removeChild(e) 
+    });
+    
+    htmlOutput = htmlObject.querySelector('div').innerHTML
+
+    return htmlOutput;
+}
+
 function renderMjml () {
 document.getElementById("errorMsg").innerHTML = "";
 document.getElementById("alertBox").style.display = "none";
 
 var textAreaContent = myCodeMirror.getValue();
+textAreaContent = validateMjmlInput(textAreaContent);
+
 var mjmlRenderedContent = "";
 
 sdk.getData(function (data) {
@@ -282,32 +310,33 @@ sdk.getData(function (data) {
 
 try { 
     var htmlOutput = mjml(textAreaContent);
-    if(htmlOutput.html.length > 0) { 
-    sdk.getContent(function (content) {
-        sdk.setContent(htmlOutput.html); 
-    });
+    if(htmlOutput.html.length > 0) {
+        htmlOutput.html = sanitiseHtml(htmlOutput.html);
+        //console.log(htmlOutput.html)
+        sdk.getContent(function (content) {
+            sdk.setContent(htmlOutput.html); 
+        });
 
-    sdk.getData(function (data) {
-        data["mjml"] = textAreaContent;
-        data["html"] = htmlOutput.html;
-        sdk.setData(data);
-    });
+        sdk.getData(function (data) {
+            data["mjml"] = textAreaContent;
+            data["html"] = htmlOutput.html;
+            sdk.setData(data);
+        });
 
-    if(htmlOutput.errors.length > 0){
+        if(htmlOutput.errors.length > 0){
+            document.getElementById("errorMsg").innerHTML = "";
+            document.getElementById("alertBox").style.display = "block";
+            for(e in htmlOutput.errors) {
+            document.getElementById("errorMsg").innerHTML += 'Line #' + htmlOutput.errors[e].line + ": [" + htmlOutput.errors[e].tagName + "] " + htmlOutput.errors[e].message + "<br>";
+            }
+        }
+    } else {
         document.getElementById("errorMsg").innerHTML = "";
         document.getElementById("alertBox").style.display = "block";
+        document.getElementById("errorMsg").innerHTML = "[ERROR]: Not a valid MJML document/ component.";
         for(e in htmlOutput.errors) {
-        document.getElementById("errorMsg").innerHTML += 'Line #' + htmlOutput.errors[e].line + ": [" + htmlOutput.errors[e].tagName + "] " + htmlOutput.errors[e].message + "<br>";
+            document.getElementById("errorMsg").innerHTML += 'Line #' + htmlOutput.errors[e].line + ": [" + htmlOutput.errors[e].tagName + "] " + htmlOutput.errors[e].message + "<br>";
         }
-    }
-
-    } else {
-    document.getElementById("errorMsg").innerHTML = "";
-    document.getElementById("alertBox").style.display = "block";
-    document.getElementById("errorMsg").innerHTML = "[ERROR]: Not a valid MJML document/ component.";
-    for(e in htmlOutput.errors) {
-        document.getElementById("errorMsg").innerHTML += 'Line #' + htmlOutput.errors[e].line + ": [" + htmlOutput.errors[e].tagName + "] " + htmlOutput.errors[e].message + "<br>";
-    }
     }
 }
 catch(e) { 
