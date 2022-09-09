@@ -320,12 +320,6 @@ catch(e) {
 return true;
 }
 
-document
-.getElementById("renderBtn")
-.addEventListener("click", function () {
-    renderMjml();
-});
-
 document.getElementById("editing").addEventListener(
 "input",
 debounce((e) => {
