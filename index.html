@@ -1,20 +1,14 @@
 <html>
   <head>
     <link rel="preconnect" href="https://fonts.gstatic.com" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap"
-      rel="stylesheet"
-    />
-    <!-- <meta http-equiv="Access-Control-Allow-Origin" content="https://mc.s10.exacttarget.com/" />
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <meta name="robots" content="noindex" /> 
-    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN"> -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet"/>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="CodeMirror/codemirror.js"></script>
     <link rel="stylesheet" href="CodeMirror/codemirror.css" />
     <script src="js/mjml.js"></script>
+    <script src="js/blocksdk.js"></script>
+    <script src="js/helper.js"></script>
+    <script src="js/foldercode.js"></script>
     <script src="CodeMirror/mode/javascript/javascript.js"></script>
     <script src="CodeMirror/mode/htmlmixed/htmlmixed.js"></script>
     <script type="text/javascript" src="CodeMirror/mode/xml/xml.js"></script>
@@ -79,7 +73,6 @@
       }
     </style>
   </head>
-
   <body>
     <div style="width: 100%; height: 80%">
       <div class="textwrapper">
@@ -93,39 +86,15 @@
       <div style="padding-top: 5px">
         <div class="alert" id="alertBox">
           <div style="width: 100%" class="alertmessage">
-            <span
-              class="close"
-              style="float: right; position: relative; top: 3px; right: 3px"
-              >&times;</span
-            >
+            <span class="close" style="float: right; position: relative; top: 3px; right: 3px">&times;</span>
             <div style="top: 10px" id="errorMsg"></div>
           </div>
         </div>
       </div>
       <div style="padding-top: 5px">
         <div>
-          <!-- <input class="btn" type="button" value="Generate" id="renderBtn" /> -->
-          <!-- <input
-            class="btn"
-            type="button"
-            value="Starwars Template"
-            style="float: right; margin: 5px"
-            id="starwarsMjml"
-            onclick="mjmlStarWarsTemplate()"
-          />
-          <input
-            class="btn"
-            type="button"
-            value="MJML Hello world"
-            style="float: right; margin: 5px"
-            id="demoMjml"
-            onclick="mjmlHelloWorld()"
-          /> -->
         </div>
       </div>
     </div>
-    <script src="js/blocksdk.js"></script>
-    <script src="js/helper.js"></script>
-    
   </body>
 </html>
