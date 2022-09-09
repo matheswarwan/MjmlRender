@@ -105,14 +105,14 @@ consoleprint(debug, data);
 
 function mjmlHelloWorld() {
 var helloWorldmjml = `<mjml>
-<mj-body>
-<mj-section>
-<mj-column>
-<mj-divider border-color="#F45E43"></mj-divider>
-<mj-text font-size="20px" color="#F45E43" font-family="helvetica">Hello World</mj-text>
-</mj-column>
-</mj-section>
-</mj-body>
+    <mj-body>
+        <mj-section>
+        <mj-column>
+            <mj-divider border-color="#F45E43"></mj-divider>
+            <mj-text font-size="20px" color="#F45E43" font-family="helvetica">Hello World</mj-text>
+        </mj-column>
+    </mj-section>
+    </mj-body>
 </mjml>`;
 myCodeMirror.setValue(helloWorldmjml);
 
@@ -300,7 +300,7 @@ function sanitiseHtml(htmlOutput) {
 // stripEmptyLines 			- (boolean) do you wish to remove empty lines?
 var formatCode = function(code, stripWhiteSpaces, stripEmptyLines) {
     "use strict";
-    var whitespace          = ' '.repeat(4);             // Default indenting 4 whitespaces
+    var whitespace          = ' '.repeat(2);             // Default indenting 4 whitespaces
     var currentIndent       = 0;
     var char                = null;
     var nextChar            = null;
