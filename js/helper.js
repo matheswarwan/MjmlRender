@@ -221,7 +221,7 @@ myCodeMirror.setValue(mjmlStarWars);
 sdk.getContent(function (data) {
     data["mjml"] = mjmlStarWars;
     sdk.setContent(
-    "507. Preview not available. Please click on render to generate HTML preview."
+    "Preview not available. Please click on render to generate HTML preview."
     );
 });
 sdk.getData(function (data) {
@@ -233,28 +233,28 @@ sdk.getData(function (data) {
 
 function getHelloWorldMJML() {
 var helloWorldmjml = `<mjml>
-<mj-body>
-<mj-section>
-<mj-column>
-<mj-divider border-color="#F45E43"></mj-divider>
-<mj-text font-size="20px" color="#F45E43" font-family="helvetica">Hello World</mj-text>
-</mj-column>
-</mj-section>
-</mj-body>
+    <mj-body>
+        <mj-section>
+        <mj-column>
+            <mj-divider border-color="#F45E43"></mj-divider>
+            <mj-text font-size="20px" color="#F45E43" font-family="helvetica">Hello World</mj-text>
+        </mj-column>
+        </mj-section>
+    </mj-body>
 </mjml>`;
 return helloWorldmjml;
 }
 
 function getHelloWorldHTML() {
 var helloWorldmjml = `<mjml>
-<mj-body>
-<mj-section>
-<mj-column>
-<mj-divider border-color="#F45E43"></mj-divider>
-<mj-text font-size="20px" color="#F45E43" font-family="helvetica">Hello World</mj-text>
-</mj-column>
-</mj-section>
-</mj-body>
+    <mj-body>
+        <mj-section>
+        <mj-column>
+            <mj-divider border-color="#F45E43"></mj-divider>
+            <mj-text font-size="20px" color="#F45E43" font-family="helvetica">Hello World</mj-text>
+        </mj-column>
+        </mj-section>
+    </mj-body>
 </mjml>`;
 try { 
     var htmlOutput = mjml(helloWorldmjml);
