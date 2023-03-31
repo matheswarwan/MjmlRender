@@ -4,8 +4,9 @@
 $allowed_domains = [
     'https://mc.s10.exacttarget.com/',
     'https://mc.s11.exacttarget.com/',
-    'https://mc.s12.exacttarget.com/',
+    'https://mc.s50.exacttarget.com/',
     'https://mc.exacttarget.com/',
+    'https://mc.s1.exacttarget.com/',
     'https://mc.s4.exacttarget.com/',
     'https://mc.s6.exacttarget.com/',
     'https://mc.s7.exacttarget.com/',
