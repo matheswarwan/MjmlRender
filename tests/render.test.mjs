@@ -29,22 +29,29 @@ before(async () => {
 });
 after(async () => { await browser?.close(); server?.close(); });
 
+// Content Builder shows the block in an iframe, so the tests do too.
 async function openBlock() {
   const context = await browser.newContext();
   const page = await context.newPage();
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));
   await page.route(/blocksdk\.js$/, r => r.fulfill({ contentType: 'text/javascript', body: mock }));
-  await page.goto(`${base}/index.html`);
-  await page.waitForFunction(() => window.__block && window.__block.data.mjml);
-  const block = () => page.evaluate(() => ({ content: __block.content, data: __block.data, calls: __block.calls.map(c => c[0]) }));
-  const type = async src => {
-    await page.evaluate(() => { __block.calls = []; });
-    await page.evaluate(s => document.querySelector('.CodeMirror').CodeMirror.setValue(s), src);
+  await page.route(/\/__host\.html$/, r => r.fulfill({ contentType: 'text/html', body: '<iframe src="/index.html" style="width:100%;height:700px;border:0"></iframe>' }));
+  const b = { page, context, errors };
+  b.frame = () => page.frames().find(f => f.url().endsWith('/index.html'));
+  b.load = async () => {
+    await page.goto(`${base}/__host.html`);
+    await page.waitForFunction(() => document.querySelector('iframe')?.contentWindow?.__block?.data?.mjml);
+  };
+  b.block = () => b.frame().evaluate(() => ({ content: __block.content, data: __block.data, calls: __block.calls.map(c => c[0]) }));
+  b.type = async src => {
+    await b.frame().evaluate(() => { __block.calls = []; });
+    await b.frame().evaluate(s => document.querySelector('.CodeMirror').CodeMirror.setValue(s), src);
     await page.waitForTimeout(900);
   };
-  const alert = () => page.evaluate(() => getComputedStyle(document.getElementById('alertBox')).display === 'none' ? '' : document.getElementById('errorMsg').textContent);
-  return { page, context, errors, block, type, alert };
+  b.alert = () => b.frame().evaluate(() => getComputedStyle(document.getElementById('alertBox')).display === 'none' ? '' : document.getElementById('errorMsg').textContent);
+  await b.load();
+  return b;
 }
 
 const TWO_COLUMNS = '<mjml><mj-body><mj-section><mj-column><mj-text>LEFT</mj-text></mj-column><mj-column><mj-text>RIGHT</mj-text></mj-column></mj-section></mj-body></mjml>';
@@ -75,8 +82,8 @@ test('two columns stay side by side (head <style> is kept)', async () => {
 
 test('typing saves once after a pause, not on every keystroke', async () => {
   const b = await openBlock();
-  await b.page.evaluate(() => { __block.calls = []; const c = document.querySelector('.CodeMirror').CodeMirror; c.setCursor(c.lineCount(), 0); });
-  await b.page.focus('.CodeMirror textarea');
+  await b.frame().evaluate(() => { __block.calls = []; const c = document.querySelector('.CodeMirror').CodeMirror; c.setCursor(c.lineCount(), 0); });
+  await b.frame().focus('.CodeMirror textarea');
   await b.page.keyboard.type('<!-- twenty-two chars -->', { delay: 30 });
   await b.page.waitForTimeout(900);
   const { calls } = await b.block();
@@ -87,8 +94,8 @@ test('typing saves once after a pause, not on every keystroke', async () => {
 
 test('Generate renders and saves straight away', async () => {
   const b = await openBlock();
-  await b.page.evaluate(() => { __block.calls = []; document.querySelector('.CodeMirror').CodeMirror.setValue('<mjml><mj-body><mj-section><mj-column><mj-text>NOW</mj-text></mj-column></mj-section></mj-body></mjml>'); });
-  await b.page.click('#renderBtn');
+  await b.frame().evaluate(() => { __block.calls = []; document.querySelector('.CodeMirror').CodeMirror.setValue('<mjml><mj-body><mj-section><mj-column><mj-text>NOW</mj-text></mj-column></mj-section></mj-body></mjml>'); });
+  await b.frame().click('#renderBtn');
   await b.page.waitForTimeout(100);
   assert.match((await b.block()).content, /NOW/, 'rendered before the 400 ms pause');
   await b.page.waitForTimeout(800);
@@ -121,7 +128,7 @@ test('validation errors are shown as text', async () => {
 test('nothing in the MJML runs inside the editor', async () => {
   const b = await openBlock();
   await b.type('<mjml><mj-body><mj-raw><img src=x onerror="window.__ran=1"></mj-raw></mj-body></mjml>');
-  assert.equal(await b.page.evaluate(() => window.__ran ?? null), null);
+  assert.equal(await b.frame().evaluate(() => window.__ran ?? null), null);
   await b.context.close();
 });
 
@@ -138,14 +145,36 @@ test('a bare snippet is wrapped for rendering but saved as typed', async () => {
 test('reopening restores the saved MJML, and the snippets tab is on this host', async () => {
   const b = await openBlock();
   await b.type(TWO_COLUMNS);
-  await b.page.reload();
-  await b.page.waitForTimeout(1200);
-  const state = await b.page.evaluate(() => ({
+  const saved = (await b.block()).content;
+  await b.load();
+  await b.page.waitForTimeout(600);
+  const state = await b.frame().evaluate(() => ({
     editor: document.querySelector('.CodeMirror').CodeMirror.getValue(),
     tab: __block.calls.find(c => c[0] === 'new')[1].tabs[1].url,
   }));
   assert.equal(state.editor, TWO_COLUMNS);
+  assert.equal((await b.block()).content, saved, 'reopening does not overwrite the saved email');
   assert.equal(state.tab, `${base}/CodeSnippets.html`);
   assert.deepEqual(b.errors, []);
   await b.context.close();
+});
+
+test('opened directly (no Content Builder), it shows Hello World and auto-renders edits', async () => {
+  // Real js/blocksdk.js, no stand-in: outside an iframe the SDK never answers.
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  await page.goto(`${base}/index.html`);
+  await page.waitForTimeout(800);
+  assert.match(await page.evaluate(() => document.querySelector('.CodeMirror').CodeMirror.getValue()), /Hello World/);
+  await page.evaluate(() => {
+    window.__saved = [];
+    const setContent = sdk.setContent.bind(sdk);
+    sdk.setContent = (html, cb) => { window.__saved.push(html); return setContent(html, cb); };
+    document.querySelector('.CodeMirror').CodeMirror.setValue('<mjml><mj-body><mj-section><mj-column><mj-text>AUTO</mj-text></mj-column></mj-section></mj-body></mjml>');
+  });
+  await page.waitForTimeout(900);
+  const saved = await page.evaluate(() => window.__saved);
+  assert.equal(saved.length, 1);
+  assert.match(saved[0], /AUTO/);
+  await context.close();
 });

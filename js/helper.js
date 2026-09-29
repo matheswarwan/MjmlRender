@@ -67,19 +67,37 @@ var sdk = new window.sfdc.BlockSDK({
 hideErrors();
 sdk.setBlockEditorWidth(500, function () {});
 
+// Edits render automatically. Loading saved MJML into the editor is not an
+// edit, so that one change is skipped.
+var restoring = false;
+myCodeMirror.on("change", function () {
+  if (!restoring) renderSoon();
+});
+
+function loadMjml(source) {
+  restoring = true;
+  myCodeMirror.setValue(source);
+  restoring = false;
+}
+
 // Restore the saved MJML. A new block starts from Hello World.
 sdk.getData(function (data) {
   if (data && typeof data.mjml === "string" && data.mjml) {
     lastGoodHtml = typeof data.html === "string" ? data.html : "";
-    myCodeMirror.setValue(data.mjml);
+    loadMjml(data.mjml);
   } else {
-    myCodeMirror.setValue(getHelloWorldMJML());
+    loadMjml(getHelloWorldMJML());
     renderMjml();
   }
-  // Only listen once the saved MJML is loaded, so restoring it doesn't
-  // count as an edit.
-  myCodeMirror.on("change", renderSoon);
 });
+
+// Opened directly rather than inside Content Builder, the Block SDK never
+// answers, so show Hello World to have something to edit. Inside Content
+// Builder this never runs, so a slow SDK can't replace a saved block.
+if (window.self === window.top) {
+  loadMjml(getHelloWorldMJML());
+  renderMjml();
+}
 
 function getHelloWorldMJML() {
 var helloWorldmjml = `<mjml>
