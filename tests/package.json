@@ -1,0 +1,11 @@
+{
+  "name": "mjmlrender-tests",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test render.test.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
+  }
+}
