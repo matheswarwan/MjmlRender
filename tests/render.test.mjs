@@ -85,6 +85,17 @@ test('typing saves once after a pause, not on every keystroke', async () => {
   await b.context.close();
 });
 
+test('Generate renders and saves straight away', async () => {
+  const b = await openBlock();
+  await b.page.evaluate(() => { __block.calls = []; document.querySelector('.CodeMirror').CodeMirror.setValue('<mjml><mj-body><mj-section><mj-column><mj-text>NOW</mj-text></mj-column></mj-section></mj-body></mjml>'); });
+  await b.page.click('#renderBtn');
+  await b.page.waitForTimeout(100);
+  assert.match((await b.block()).content, /NOW/, 'rendered before the 400 ms pause');
+  await b.page.waitForTimeout(800);
+  assert.equal((await b.block()).calls.filter(c => c === 'setContent').length, 1, 'the pending auto-render was cancelled');
+  await b.context.close();
+});
+
 test('broken or empty MJML keeps the last good email and says so', async () => {
   const b = await openBlock();
   await b.type(TWO_COLUMNS);

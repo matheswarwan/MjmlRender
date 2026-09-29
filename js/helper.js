@@ -30,7 +30,7 @@ var lastGoodHtml = "";
 
 const debounce = (fn, delay) => {
   let timeOutID;
-  return function (...args) {
+  const debounced = function (...args) {
     if (timeOutID) {
       clearTimeout(timeOutID);
     }
@@ -38,7 +38,17 @@ const debounce = (fn, delay) => {
       fn(...args);
     }, delay);
   };
+  debounced.cancel = () => clearTimeout(timeOutID);
+  return debounced;
 };
+
+var renderSoon = debounce(renderMjml, RENDER_DELAY_MS);
+
+// Generate renders and saves straight away, without waiting for a pause.
+document.getElementById("renderBtn").addEventListener("click", function () {
+  renderSoon.cancel();
+  renderMjml();
+});
 
 var sdk = new window.sfdc.BlockSDK({
   blockEditorWidth: 500,
@@ -68,7 +78,7 @@ sdk.getData(function (data) {
   }
   // Only listen once the saved MJML is loaded, so restoring it doesn't
   // count as an edit.
-  myCodeMirror.on("change", debounce(renderMjml, RENDER_DELAY_MS));
+  myCodeMirror.on("change", renderSoon);
 });
 
 function getHelloWorldMJML() {

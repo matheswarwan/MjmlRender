@@ -5,7 +5,7 @@ A custom Content Builder block that lets you write responsive emails in [MJML](h
 ## Features
 
 - **MJML editor:** a CodeMirror editor with line numbers, XML/HTML/CSS highlighting and code folding (click the gutter arrows, or press Ctrl-Q).
-- **Live render:** compiles to HTML 400 ms after you stop typing, using the browser build of MJML (`js/mjml.js`). No server-side rendering is needed. Each render saves the block once.
+- **Live render:** compiles to HTML 400 ms after you stop typing, using the browser build of MJML (`js/mjml.js`). No server-side rendering is needed. Each render saves the block once. **Generate** renders and saves straight away.
 - **Inline errors:** MJML validation errors appear below the editor, with line number and tag.
 - **Safe while you edit:** if the MJML is broken or renders nothing (for example halfway through pasting a new template), the email keeps the last version that rendered, and the message says so. Your MJML is still saved.
 - **Bare snippets:** you can paste just sections without `<mjml><mj-body>`, and the block wraps them for rendering.
