@@ -10,6 +10,8 @@ A custom Content Builder block that lets you write responsive emails in [MJML](h
 - **Safe while you edit:** if the MJML is broken or renders nothing (for example halfway through pasting a new template), the email keeps the last version that rendered, and the message says so. Your MJML is still saved.
 - **Bare snippets:** you can paste just sections without `<mjml><mj-body>`, and the block wraps them for rendering.
 - **Round-trip editing:** the MJML source is stored in the block's data (`sdk.setData`) next to the generated HTML. Reopening the block brings back your MJML, not just the compiled output.
+- **Output setting:** choose what the block adds to the email besides your content. **Whole email** (the default, and what blocks saved before this setting keep) adds everything MJML produces. **Part of an email** is for emails with several blocks: it leaves out MJML's reset CSS for `body`, `table`, `img` and `p` (which changes the whole email), the Outlook settings and the `mj-body` background wrapper, and keeps the column media queries and your `<mj-style>` CSS. Under **Choose what the block adds** each part can be switched on or off: reset CSS, Outlook settings, font links, column media queries, body wrapper. The setting is saved with the block. Empty `<style>` tags and the empty comments left from dropped `<meta>` tags are always removed.
+- **Copy HTML:** copies the HTML the block puts in the email.
 - **Code Snippets tab:** an extra editor tab with copy-to-clipboard snippets and a short reference for common MJML tags: `mj-body`, `mj-include`, `mj-attributes`, `mj-accordion`, `mj-button`, `mj-image`, `mj-social`.
 - **Starter template:** a new block starts with a "Hello World" MJML example.
 
@@ -26,7 +28,7 @@ Content Builder ── iframe ──▶ index.php → index.html
 
 The block is built on the [SFMC Block SDK](https://github.com/salesforce-marketingcloud/blocksdk) (`js/blocksdk.js`). The editor logic is in `js/helper.js`.
 
-MJML returns a whole HTML document, but a block is a fragment of the email. So the block keeps what the email needs from `<head>`: the `<style>` blocks with the column media queries, the Outlook conditional comments and the font links. It drops `<meta>` and `<title>` and adds the body. Parsing uses `DOMParser`, so nothing in your MJML runs or loads inside the editor.
+MJML returns a whole HTML document, but a block is a fragment of the email. So the block keeps what the Output setting asks for from `<head>` (reset CSS, Outlook settings, font links, column media queries; your `<mj-style>` CSS always), drops `<meta>` and `<title>`, and adds the body, with or without the `mj-body` wrapper. With several MJML blocks in one email, use **Part of an email** on all but one of them (or all, if the email template has its own reset CSS), so the head output is not repeated per block. Font links are needed once per font: MJML's default font for text and buttons is Ubuntu, so its link is there unless you set a `font-family`. Parsing uses `DOMParser`, so nothing in your MJML runs or loads inside the editor.
 
 ## Setup
 
