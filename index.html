@@ -67,7 +67,50 @@
       textarea {
         width: 100%;
       }
+      .btn-secondary {
+        background: #fff;
+        color: #0070d2;
+        border: 1px solid #c9c9c9;
+        margin-left: 4px;
+      }
+      .note {
+        font: 12px Arial;
+        color: #3e3e3c;
+        margin-left: 6px;
+      }
+      .output {
+        font: 12px Arial;
+        color: #3e3e3c;
+        padding-top: 8px;
+      }
+      .output select {
+        font: 12px Arial;
+        margin-left: 4px;
+      }
+      .output summary {
+        cursor: pointer;
+        margin-top: 6px;
+        color: #0070d2;
+      }
+      .output details label {
+        display: block;
+        margin: 4px 0 0 4px;
+      }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+      }
+      .page {
+        box-sizing: border-box;
+        height: 100%;
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+      }
       .textwrapper {
+        flex: 1 1 auto;
+        min-height: 160px;
         border: 1px solid #999999;
         margin: 5px 0;
         padding: 3px;
@@ -75,7 +118,7 @@
     </style>
   </head>
   <body>
-    <div style="width: 100%; height: 80%">
+    <div class="page">
       <div class="textwrapper">
         <textarea
           style="width: 100%; height: 80%"
@@ -95,7 +138,25 @@
       <div style="padding-top: 5px">
         <div>
           <input class="btn" type="button" value="Generate" id="renderBtn" />
+          <input class="btn btn-secondary" type="button" value="Copy HTML" id="copyBtn" />
+          <span id="copyNote" class="note"></span>
         </div>
+      </div>
+      <div class="output">
+        <label for="outputMode">Output</label>
+        <select id="outputMode">
+          <option value="email">Whole email: everything MJML adds (default)</option>
+          <option value="part">Part of an email: body and column CSS only</option>
+          <option value="custom" disabled>Custom</option>
+        </select>
+        <details>
+          <summary>Choose what the block adds</summary>
+          <label><input type="checkbox" id="opt-reset" /> Reset CSS for body, table, img and p (applies to the whole email)</label>
+          <label><input type="checkbox" id="opt-outlook" /> Outlook settings and column fix</label>
+          <label><input type="checkbox" id="opt-fonts" /> Font links (Google Fonts, and Ubuntu, MJML's default)</label>
+          <label><input type="checkbox" id="opt-media" /> Column media queries (columns side by side on wide screens)</label>
+          <label><input type="checkbox" id="opt-wrapper" /> Body wrapper with the mj-body background colour</label>
+        </details>
       </div>
     </div>
   </body>

@@ -178,3 +178,101 @@ test('opened directly (no Content Builder), it shows Hello World and auto-render
   assert.match(saved[0], /AUTO/);
   await context.close();
 });
+
+// Review: with several MJML blocks in one email, each repeated MJML's head output.
+const STYLED = '<mjml><mj-head><mj-style>.mine{color:red}</mj-style></mj-head><mj-body background-color="#123456"><mj-section><mj-column><mj-text css-class="mine">ONE</mj-text></mj-column><mj-column><mj-button>TWO</mj-button></mj-column></mj-section></mj-body></mjml>';
+const pick = (b, value) => b.frame().evaluate(v => { const s = document.getElementById('outputMode'); s.value = v; s.dispatchEvent(new Event('change')); }, value);
+
+test('Whole email (default) keeps everything MJML adds, minus empty styles and leftover comments', async () => {
+  const b = await openBlock();
+  await b.type(STYLED);
+  const { content, data } = await b.block();
+  assert.match(content, /#outlook a/);
+  assert.match(content, /o:OfficeDocumentSettings/);
+  assert.match(content, /fonts\.googleapis\.com/);
+  assert.match(content, /mj-column-per-50/);
+  assert.match(content, /background-color:#123456/);
+  assert.match(content, /\.mine/);
+  assert.doesNotMatch(content, /<style[^>]*>\s*<\/style>/, 'no empty <style>');
+  assert.doesNotMatch(content, /<!--\[if !mso\]><!-->\s*<!--<!\[endif\]-->/, 'no empty comment pair');
+  assert.equal(await b.frame().evaluate(() => document.getElementById('outputMode').value), 'email');
+  assert.equal(data.options.reset, true);
+  await b.context.close();
+});
+
+test('Part of an email drops the reset CSS, Outlook settings and body wrapper, and is saved', async () => {
+  const b = await openBlock();
+  await b.type(STYLED);
+  await pick(b, 'part');
+  await b.page.waitForTimeout(100);
+  const { content, data } = await b.block();
+  assert.doesNotMatch(content, /#outlook a|body\s*\{|o:OfficeDocumentSettings|\.mj-outlook-group-fix\s*\{/);
+  assert.doesNotMatch(content, /background-color:#123456/);
+  assert.match(content, /mj-column-per-50/, 'column CSS kept');
+  assert.match(content, /\.mine/, 'mj-style CSS kept');
+  assert.match(content, /ONE/);
+  assert.equal(data.options.reset, false);
+  // Reopening keeps the choice.
+  await b.load();
+  await b.page.waitForTimeout(600);
+  assert.equal(await b.frame().evaluate(() => document.getElementById('outputMode').value), 'part');
+  assert.deepEqual(b.errors, []);
+  await b.context.close();
+});
+
+test('each part can be turned off on its own (Custom)', async () => {
+  const b = await openBlock();
+  await b.type(STYLED);
+  await b.frame().click('summary');
+  await b.frame().click('#opt-fonts');
+  await b.page.waitForTimeout(100);
+  const { content, data } = await b.block();
+  assert.doesNotMatch(content, /fonts\.googleapis\.com/);
+  assert.match(content, /#outlook a/);
+  assert.equal(data.options.fonts, false);
+  assert.equal(await b.frame().evaluate(() => document.getElementById('outputMode').value), 'custom');
+  await b.context.close();
+});
+
+test('two Part blocks side by side still lay out in columns', async () => {
+  const b = await openBlock();
+  await b.type(TWO_COLUMNS);
+  await pick(b, 'part');
+  await b.page.waitForTimeout(100);
+  const { content } = await b.block();
+  const view = await b.context.newPage();
+  await view.setViewportSize({ width: 700, height: 600 });
+  await view.setContent(`<!doctype html><html><body>${content}${content}</body></html>`);
+  const tops = await view.evaluate(() => ['LEFT', 'RIGHT'].map(t =>
+    [...document.querySelectorAll('div')].filter(d => d.textContent.trim() === t).pop().getBoundingClientRect().top));
+  assert.ok(Math.abs(tops[0] - tops[1]) < 5);
+  await b.context.close();
+});
+
+test('Copy HTML copies what the email gets', async () => {
+  const b = await openBlock();
+  await b.context.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: base });
+  await b.type(TWO_COLUMNS);
+  await b.frame().click('#copyBtn');
+  await b.page.waitForTimeout(200);
+  const copied = await b.frame().evaluate(() => navigator.clipboard.readText());
+  assert.equal(copied, (await b.block()).content);
+  assert.match(await b.frame().evaluate(() => document.getElementById('copyNote').textContent), /Copied/);
+  await b.context.close();
+});
+
+test('a block saved before the Output setting existed keeps the whole-email output', async () => {
+  const b = await openBlock();
+  await b.frame().evaluate(m => sessionStorage.setItem('__block', JSON.stringify({ content: 'OLD', data: { mjml: m, html: 'OLD' } })), TWO_COLUMNS);
+  await b.load();
+  await b.page.waitForTimeout(600);
+  assert.equal(await b.frame().evaluate(() => document.getElementById('outputMode').value), 'email');
+  assert.equal((await b.block()).content, 'OLD', 'opening does not re-render');
+  await b.frame().click('#renderBtn');
+  await b.page.waitForTimeout(100);
+  assert.match((await b.block()).content, /#outlook a/);
+  await b.page.setViewportSize({ width: 520, height: 760 });
+  await b.frame().click('summary');
+  await b.page.screenshot({ path: process.env.SHOT || '/dev/null' });
+  await b.context.close();
+});

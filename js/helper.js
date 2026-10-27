@@ -28,6 +28,81 @@ var RENDER_DELAY_MS = 400;
 // instead of a placeholder or an empty email.
 var lastGoodHtml = "";
 
+// What the block writes besides the email body (review: with several MJML blocks
+// in one email, each one repeated MJML's head output). "email" is the whole-email
+// output this block always had, and stays the default so existing blocks keep it.
+var PRESETS = {
+  email: { reset: true, outlook: true, fonts: true, media: true, wrapper: true },
+  part: { reset: false, outlook: false, fonts: true, media: true, wrapper: false },
+};
+var OPTION_KEYS = ["reset", "outlook", "fonts", "media", "wrapper"];
+var options = Object.assign({}, PRESETS.email);
+
+function readOptions(saved) {
+  var out = Object.assign({}, PRESETS.email);
+  if (saved && typeof saved === "object") {
+    OPTION_KEYS.forEach(function (k) { if (typeof saved[k] === "boolean") out[k] = saved[k]; });
+  }
+  return out;
+}
+
+function presetOf(opts) {
+  return Object.keys(PRESETS).find(function (name) {
+    return OPTION_KEYS.every(function (k) { return PRESETS[name][k] === opts[k]; });
+  }) || "custom";
+}
+
+function showOptions() {
+  document.getElementById("outputMode").value = presetOf(options);
+  OPTION_KEYS.forEach(function (k) { document.getElementById("opt-" + k).checked = options[k]; });
+}
+
+document.getElementById("outputMode").addEventListener("change", function () {
+  if (PRESETS[this.value]) options = Object.assign({}, PRESETS[this.value]);
+  showOptions();
+  renderSoon.cancel();
+  renderMjml();
+});
+OPTION_KEYS.forEach(function (k) {
+  document.getElementById("opt-" + k).addEventListener("change", function () {
+    options[k] = this.checked;
+    showOptions();
+    renderSoon.cancel();
+    renderMjml();
+  });
+});
+showOptions();
+
+// Copies the HTML the email gets, for people who want to paste it elsewhere.
+// Content Builder's iframe may not allow the clipboard API, so fall back to a
+// selected textarea.
+document.getElementById("copyBtn").addEventListener("click", function () {
+  var html = lastGoodHtml;
+  var done = function () { flash("Copied the block's HTML."); };
+  var fallback = function () {
+    var box = document.createElement("textarea");
+    box.value = html;
+    box.style.position = "fixed";
+    box.style.opacity = "0";
+    document.body.appendChild(box);
+    box.select();
+    var ok = false;
+    try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+    box.remove();
+    ok ? done() : flash("Copy was blocked here. Select the text in your browser's console with copy(lastGoodHtml).");
+  };
+  if (!html) return flash("Nothing has rendered yet.");
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(html).then(done, fallback);
+  else fallback();
+});
+
+function flash(text) {
+  var note = document.getElementById("copyNote");
+  note.textContent = text;
+  clearTimeout(flash.timer);
+  flash.timer = setTimeout(function () { note.textContent = ""; }, 3000);
+}
+
 const debounce = (fn, delay) => {
   let timeOutID;
   const debounced = function (...args) {
@@ -82,6 +157,8 @@ function loadMjml(source) {
 
 // Restore the saved MJML. A new block starts from Hello World.
 sdk.getData(function (data) {
+  options = readOptions(data && data.options);
+  showOptions();
   if (data && typeof data.mjml === "string" && data.mjml) {
     lastGoodHtml = typeof data.html === "string" ? data.html : "";
     loadMjml(data.mjml);
@@ -125,19 +202,54 @@ function validateMjmlInput(textAreaContent) {
 
 
 // MJML returns a whole document, but a Content Builder block is a fragment of
-// the email. Keep everything the email needs from <head> (the <style> blocks
-// with the column media queries, Outlook conditional comments, font links),
-// drop <meta> and <title>, then add the body. DOMParser builds an inert
-// document, so nothing in the output runs or loads while this happens.
-function sanitiseHtml(htmlOutput) {
+// the email. Keep what the options ask for from <head>, drop <meta> and <title>,
+// then add the body. DOMParser builds an inert document, so nothing in the output
+// runs or loads while this happens.
+//   reset    MJML's global CSS for body, table, td, img and p (it changes the
+//            whole email, not just this block)
+//   outlook  Office XML settings and the Outlook column fix
+//   fonts    font <link> and @import lines (Ubuntu is MJML's default font for
+//            text and buttons, so it is there unless a font-family is set)
+//   media    the column media queries (needed for columns side by side)
+//   wrapper  the mj-body <div> with its background colour
+// CSS from <mj-style> and comments of the user's own are always kept.
+function headPart(node) {
+  if (node.nodeType === Node.COMMENT_NODE) {
+    var c = node.data;
+    if (/o:OfficeDocumentSettings|mj-outlook-group-fix/.test(c)) return "outlook";
+    if (/<link\b|@import/.test(c)) return "fonts";
+    return "comment";
+  }
+  if (node.nodeType !== Node.ELEMENT_NODE) return null;
+  if (/^(META|TITLE)$/.test(node.tagName)) return null;
+  if (node.tagName === "LINK") return "fonts";
+  if (node.tagName === "STYLE") {
+    var css = node.textContent;
+    if (!css.trim()) return null;
+    if (/#outlook a\s*\{/.test(css)) return "reset";
+    if (/@import/.test(css) && !css.replace(/@import[^;]*;/g, "").trim()) return "fonts";
+    if (/@media|\.moz-text-html/.test(css) && /\.mj-column-|mj-full-width-mobile|\.moz-text-html/.test(css)) return "media";
+  }
+  return "keep";
+}
+
+function sanitiseHtml(htmlOutput, opts) {
+  opts = opts || PRESETS.email;
   var doc = new DOMParser().parseFromString(htmlOutput, "text/html");
   var head = "";
   doc.head.childNodes.forEach(function (node) {
-    if (node.nodeType === Node.COMMENT_NODE) head += "<!--" + node.data + "-->";
-    else if (node.nodeType === Node.ELEMENT_NODE && !/^(META|TITLE)$/.test(node.tagName)) head += node.outerHTML;
+    var part = headPart(node);
+    if (!part || (part in opts && !opts[part])) return;
+    head += node.nodeType === Node.COMMENT_NODE ? "<!--" + node.data + "-->" : node.outerHTML;
   });
+  // The X-UA-Compatible <meta> is dropped, which leaves its empty "not Outlook"
+  // comment pair behind.
+  head = head.replace(/<!--\[if !mso\]><!-->\s*<!--<!\[endif\]-->/g, "");
+  var body = doc.body;
+  var wrapper = body.children.length === 1 && body.firstElementChild.tagName === "DIV" ? body.firstElementChild : null;
+  var inner = !opts.wrapper && wrapper ? wrapper.innerHTML : body.innerHTML;
   var config = { indent_size: 2, space_in_empty_paren: false, keep_array_indentation: true };
-  return html_beautify(head + doc.body.innerHTML, config);
+  return html_beautify(head + inner, config);
 }
 
 // True when the body has nothing a reader would see.
@@ -185,15 +297,15 @@ function renderMjml() {
     messages.unshift("mj-include is not supported here: the block renders in your browser and cannot read other files.");
   }
 
-  var html = result && result.html ? sanitiseHtml(result.html) : "";
+  var html = result && result.html ? sanitiseHtml(result.html, options) : "";
   if (html && !rendersNothing(html)) {
     lastGoodHtml = html;
     sdk.setContent(lastGoodHtml);
-    sdk.setData({ mjml: typed, html: lastGoodHtml });
+    sdk.setData({ mjml: typed, html: lastGoodHtml, options: options });
     if (messages.length) showErrors(messages);
     else hideErrors();
   } else {
-    sdk.setData({ mjml: typed, html: lastGoodHtml });
+    sdk.setData({ mjml: typed, html: lastGoodHtml, options: options });
     var why = html ? "This MJML renders an empty email." : "Not valid MJML yet.";
     messages.unshift(lastGoodHtml ? why + " The email still shows the last version that rendered." : why);
     showErrors(messages);
